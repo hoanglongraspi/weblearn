@@ -1,0 +1,148 @@
+{
+  "1_4_Databases": {
+    "title": "Databases: State Persistence (Deep Dive)",
+    "description": "SQL vs NoSQL, Collections, and defeating SQL Injection.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### Where data lives forever\nWhen your Node.js server crashes or restarts, everything stored in its RAM (variables, arrays) vanishes. To build a persistent app, you need a safe vault that survives restarts. This is the **Database**.\n\nDatabases operate as entirely separate software processes. Your web server communicates with the Database via a network socket. There are two major families: **SQL (Relational)** and **NoSQL (Document-based)**."
+      },
+      {
+        "type": "concept",
+        "title": "SQL Injection: The Most Famous Hack",
+        "content": "In SQL databases, you write queries like: `SELECT * FROM users WHERE username = '` + user_input + `'`.\n\n**The Hack:** If an attacker types `' OR 1=1; --` into the username box, the query becomes:\n`SELECT * FROM users WHERE username = '' OR 1=1; --'`\nThis evaluates to TRUE for every single user, logging them in as the first user (usually the admin) without a password!\n\n**The Fix:** NEVER concatenate strings into SQL queries. Always use **Prepared Statements**. Prepared statements send the query structure and the user input separately, ensuring the database treats the input strictly as data, never as executable code."
+      },
+      {
+        "type": "quiz",
+        "question": "Which of the following completely eliminates the risk of SQL Injection?",
+        "options": [
+          "Using a Regex to filter out semicolons.",
+          "Hashing the user's password using bcrypt.",
+          "Using Prepared Statements.",
+          "Running the database on a separate Docker container."
+        ],
+        "answer": 2,
+        "explanation": "Prepared Statements (or Parameterized Queries) are the absolute standard for stopping SQL Injection. They force the database driver to compile the query beforehand, mapping user input strictly as inert string values."
+      },
+      {
+        "type": "concept",
+        "title": "NoSQL & MongoDB",
+        "content": "In this course, we often use **MongoDB**, a NoSQL database.\n- Instead of Tables and Rows, MongoDB uses **Collections** and **Documents**.\n- Documents are stored in **BSON** (Binary JSON).\n- MongoDB natively prevents traditional SQL Injection because queries are structurally defined as JSON objects (e.g., `{ username: \"admin\" }`), rather than parsed as a raw string of code."
+      }
+    ]
+  },
+  "1_7_Docker": {
+    "title": "Docker: Containerization (Deep Dive)",
+    "description": "Images, Containers, Port Mapping, and Volumes.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### \"It works on my machine...\"\nThe classic developer excuse when deploying code. Your code works on your Macbook, but crashes on the Linux production server because it has a different version of Python or Node installed.\n\n**Docker** solves this by shipping your code *and* the entire required operating system environment together in a standardized box called a **Container**. If a container runs on your laptop, Docker guarantees it will run exactly the same way in the cloud."
+      },
+      {
+        "type": "concept",
+        "title": "Images vs Containers",
+        "content": "**Images** are immutable blueprints. A `Dockerfile` is a script that tells Docker how to build an Image (e.g., `FROM node:18`, `COPY . /app`, `RUN npm install`).\n\n**Containers** are the actual running instances of an Image. You can launch 100 identical containers from a single Image. If a container crashes or is deleted, all data inside it is wiped."
+      },
+      {
+        "type": "concept",
+        "title": "Port Mapping & Volumes",
+        "content": "Containers are severely isolated for security. \n- **Port Mapping (`-p 8080:80`)**: If your Node app is listening on Port 80 inside the container, nobody outside can reach it. You must map a port on your Host machine (8080) to the container's port (80).\n- **Volumes**: Since containers are ephemeral (data is lost on restart), you use Volumes to map a folder on your Host hard drive directly into the container. This is how databases survive a container reboot."
+      },
+      {
+        "type": "quiz",
+        "question": "What is the primary difference between a Docker Image and a Docker Container?",
+        "options": [
+          "An Image is a running instance, a Container is the blueprint.",
+          "An Image is the read-only blueprint, the Container is the running, isolated instance.",
+          "Images are used for Front-End, Containers are used for Back-End.",
+          "They are two words for the exact same thing."
+        ],
+        "answer": 1,
+        "explanation": "The Image is the finalized, read-only template created by building a Dockerfile. A Container is an active, running process birthed from that template."
+      }
+    ]
+  },
+  "2_8_XSRF": {
+    "title": "XSRF: Cross-Site Request Forgery",
+    "description": "Tricking users into sending authorized requests.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### The Invisible Theft\nImagine you are logged into your bank (Bank.com). Your browser has a session cookie for Bank.com. \nYou browse to an attacker's site (Evil.com). Evil.com has a hidden `<form action=\"https://bank.com/transfer\">` that submits immediately via JavaScript.\n\nWhen the form submits to Bank.com, **your browser automatically attaches your Bank.com session cookie**. The bank sees a valid request from YOU, and transfers the money. This is **XSRF**."
+      },
+      {
+        "type": "concept",
+        "title": "Defense 1: SameSite Cookies",
+        "content": "The easiest defense against XSRF is the `SameSite` cookie directive.\n- **SameSite=Strict**: The browser will ONLY send the cookie if the user is currently on your domain. If Evil.com triggers a request to Bank.com, the browser strips the cookie out. The request fails as unauthenticated.\n- **SameSite=Lax**: Strips the cookie for POST requests from Evil.com, but keeps it for top-level GET navigation. (This is the default in modern browsers)."
+      },
+      {
+        "type": "quiz",
+        "question": "If you rely entirely on cookies for authentication, an attacker triggering a POST request from their website to your server is attempting an __ attack?",
+        "options": ["XSS (Cross-Site Scripting)", "XSRF (Cross-Site Request Forgery)", "SQL Injection", "DDoS"],
+        "answer": 1,
+        "explanation": "XSRF exploits the browser's automatic behavior of attaching cookies to cross-origin requests. XSS, by contrast, involves injecting malicious JS directly into your actual site."
+      },
+      {
+        "type": "concept",
+        "title": "Defense 2: Anti-XSRF Tokens",
+        "content": "If you cannot use SameSite cookies (e.g., older APIs), you use **Anti-XSRF Tokens**.\n1. When the server renders an HTML form, it generates a massive random string (the Token) and embeds it as a hidden field in the form.\n2. The server remembers this token in the user's session.\n3. When the user submits, they send the token. The server verifies it matches.\n Evil.com cannot see or guess this token, so their forged requests will be rejected."
+      }
+    ]
+  },
+  "3_3_WebSocket_Handshake": {
+    "title": "WebSocket Handshake (Deep Dive)",
+    "description": "Upgrading HTTP to a persistent connection.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### Tearing down the walls\nHTTP is strictly Request-Response. If the server wants to send new chat messages to the client, it cannot do it until the client explicitly asks. \n\n**WebSockets** fundamentally alter this. A WebSocket connection starts exactly like a standard HTTP request. But inside the headers, the client shouts: \"Hey server, I want to Upgrade this HTTP line into a WebSocket!\" If the server agrees, the HTTP protocol is thrown away, and the exact same TCP socket is held open for real-time, two-way, persistent communication."
+      },
+      {
+        "type": "concept",
+        "title": "The Upgrade Request",
+        "content": "The client initiates the handshake with a standard `GET` request containing specific headers:\n- `Connection: Upgrade`\n- `Upgrade: websocket`\n- `Sec-WebSocket-Key: <base64_random_string>`\n\nWithout these headers, it's just a normal HTTP request."
+      },
+      {
+        "type": "concept",
+        "title": "The Server's Mathematical Proof",
+        "content": "To prove to the client that the server *actually* understands WebSockets (and isn't just a confused HTTP server), the server MUST perform a specific math operation:\n1. Read the client's `Sec-WebSocket-Key`.\n2. Append a globally fixed Magic String: `258EAFA5-E914-47DA-95CA-C5AB0DC85B11`.\n3. Hash the concatenated string using **SHA-1**.\n4. Encode that hash in **Base64**.\n5. Send it back in the `Sec-WebSocket-Accept` header alongside a `101 Switching Protocols` status code.\n\nIf the math is even slightly wrong, the browser instantly drops the connection."
+      },
+      {
+        "type": "quiz",
+        "question": "What Status Code does a server send to finalize a successful WebSocket Handshake?",
+        "options": ["200 OK", "301 Moved Permanently", "101 Switching Protocols", "426 Upgrade Required"],
+        "answer": 2,
+        "explanation": "A 101 Switching Protocols explicitly tells the browser: 'I acknowledge the Upgrade request, and we are now conversing in WebSockets over this exact TCP socket.'"
+      }
+    ]
+  },
+  "1_3_POST": {
+    "title": "POST Requests & Data Structuring",
+    "description": "How to properly submit heavy data through HTTP.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "When to use POST vs GET",
+        "content": "GET requests encode all their parameters in the URL (the Query String). This has a hard length limit set by browsers/servers, and the parameters are highly visible and stored in browser history.\n\n**POST** requests send their data inside the HTTP **Body**. This allows the sending of massive amounts of data (like video uploads) and keeps sensitive actions out of the URL bar."
+      },
+      {
+        "type": "concept",
+        "title": "Formatting the Body",
+        "content": "When a browser submits an HTML `<form>`, it defaults to encoding the inputs as `application/x-www-form-urlencoded`. \nThis format looks exactly like a URL query string: `username=admin&password=1234&color=blue`.\n\nWhen sending JSON from JavaScript `fetch()`, the body is formatted as `application/json`, which requires entirely different parsing logic on the backend."
+      },
+      {
+        "type": "quiz",
+        "question": "Why is it unsafe to use a GET request for a 'Delete Account' action?",
+        "options": [
+          "GET requests are not encrypted.",
+          "Browsers can pre-fetch URLs or users can share the URL, accidentally triggering the deletion.",
+          "GET requests cannot reach databases.",
+          "A GET request can only return HTML."
+        ],
+        "answer": 1,
+        "explanation": "GET requests must be 'safe' and 'idempotent' (should not alter server state). If deletion was a GET request, a user clicking a simple link or the browser pre-loading a page could permanently delete the account."
+      }
+    ]
+  }
+}

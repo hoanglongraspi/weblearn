@@ -1,0 +1,79 @@
+{
+  "3_4_WebSocket_Frames": {
+    "title": "WebSocket Framing",
+    "description": "How continuous TCP streams are chopped into discrete WebSocket messages.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### Chopping the Stream\nBecause TCP is a continuous stream of raw bytes, WebSockets must implement **Framing** to re-create the concept of discrete 'Messages'. \nA Frame is a strict sequence of bits. The first few bits metadata (Is this the end of the message? Is it text or binary? Is it masked?), and the rest of the bits are the actual payload."
+      },
+      {
+        "type": "concept",
+        "title": "The First Byte",
+        "content": "When reading a WebSocket frame, the absolute first byte (8 bits) dictates the message state:\n- **FIN Bit (1st bit)**: If `1`, this is the final piece of the message. If `0`, expect more frames to follow.\n- **RSV1, RSV2, RSV3 (2nd, 3rd, 4th bits)**: Reserved for extensions. Always `0` for our assignments.\n- **Opcode (Last 4 bits)**: Dictates what type of data this is. \n  - `0001` (1) = Text Frame.\n  - `0010` (2) = Binary Frame.\n  - `1000` (8) = Connection Close."
+      },
+      {
+        "type": "quiz",
+        "question": "If you read the very first byte of a WebSocket frame and it precisely equates to the binary value 10000001 (Decimal 129), what kind of frame is this?",
+        "options": [
+          "A fragmented binary message.",
+          "A final text message.",
+          "A ping request.",
+          "A connection close."
+        ],
+        "answer": 1,
+        "explanation": "10000001 means the FIN bit is 1 (Final fragment), the RSV bits are 000, and the Opcode is 0001 (Text). This is a completed, unfragmented text message!"
+      }
+    ]
+  },
+  "3_5_WebSocket_Buffers": {
+    "title": "Decoding WebSocket Length",
+    "description": "The nightmare of bitwise operators and 64-bit lengths.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "The Payload Length Math",
+        "content": "The second byte of a WebSocket frame contains the **Mask Bit** and the **Payload Length**.\n\nBecause WebSockets can send everything from a 1-byte letter to a 5-Gigabyte 4K movie, the Payload Length field dynamically expands:\n1. Read the 7-bit length (`byte[1] & 127`).\n2. If it is `<= 125`, that's the length.\n3. If it is exactly `126`, read the next **2 bytes** as a 16-bit unsigned integer.\n4. If it is exactly `127`, read the next **8 bytes** as a 64-bit unsigned integer."
+      },
+      {
+        "type": "concept",
+        "title": "Masking to Prevent Cache Poisoning",
+        "content": "Security Rule: **All messages from Client to Server MUST be masked.**\nIf the server receives an unmasked frame from a client, it must instantly drop the connection.\n\nMasking uses an XOR cipher. The client generates a random 4-byte key. The server reads this 4-byte key and applies an XOR bitwise operation against every byte of the payload to reveal the true text. This prevents intermediate proxy servers from accidentally caching malicious HTTP-like plaintext that happens to be embedded inside a TCP WebSocket frame."
+      }
+    ]
+  },
+  "3_6_Video1": {
+    "title": "Streaming Video Basics",
+    "description": "MP4 vs Streaming, HTML5 `<video>` tags.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "The Problem with MP4",
+        "content": "An `.mp4` file is a rigid container. Historically, if a user wanted to watch a 2-hour movie, their browser had to download the entire multi-gigabyte `.mp4` file before playback could reliably begin.\n\nModern video relies on **Streaming**. The video isn't sent as one monolithic file. It is broken into tiny, 5-second chunks (Manifest files) that the browser requests individually."
+      }
+    ]
+  },
+  "3_6_Video2": {
+    "title": "Advanced Video (HLS & DASH)",
+    "description": "How Netflix changes video quality on the fly.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "Adaptive Bitrate Streaming",
+        "content": "Protocols like **HLS (HTTP Live Streaming)** and **DASH** solve the ultimate networking problem: Fluctuating WiFi.\n\n1. The server encodes the same 5-second video chunk at 4K, 1080p, 720p, and 480p.\n2. The server provides a Manifest file listing all these chunks.\n3. The Client's browser actively monitors its download speed. \n4. If the WiFi drops, the Client automatically requests the next 5-second chunk at 480p instead of 1080p, ensuring the video NEVER pauses to buffer."
+      },
+      {
+        "type": "quiz",
+        "question": "In Adaptive Bitrate Streaming (like HLS), who makes the decision to switch the video quality from 1080p to 480p?",
+        "options": [
+          "The Server.",
+          "The Client (The Browser/Video Player).",
+          "The Internet Service Provider (ISP).",
+          "The CDN Load Balancer."
+        ],
+        "answer": 1,
+        "explanation": "The Client is intrinsically aware of how fast its buffers are emptying and filling. It continuously calculates its bandwidth and autonomously requests the appropriate resolution chunk from the server."
+      }
+    ]
+  }
+}

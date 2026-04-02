@@ -1,0 +1,80 @@
+{
+  "2_10_OAuth": {
+    "title": "OAuth 2.0: Federated Authentication",
+    "description": "Log In With Google/Github. Redirect URIs and State Parameters.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### Giving the keys without giving the password\nImagine staying at a hotel. Instead of the owner giving you the master key to the building, they give you a temporary keycard that only opens room 402 for 3 days. \n\n**OAuth (Open Authorization)** works like this. If a user clicks 'Log In With GitHub' on your app, they don't give your app their GitHub password. Instead, GitHub authenticates them, and gives your app a temporary 'keycard' (an Access Token) that just proves who they are."
+      },
+      {
+        "type": "concept",
+        "title": "The OAuth Dance",
+        "content": "1. User clicks \"Login with GitHub\". Your app Redirects (Status 302) the user to `github.com/login/oauth/authorize?client_id=123&redirect_uri=yourapp.com/github/callback`.\n2. User logs in on GitHub's secure servers. GitHub asks: \"Do you want to share your email with App 123?\"\n3. User clicks Yes. GitHub Redirects the user *back* to your `redirect_uri`, passing an **Authorization Code** in the URL.\n4. Your server takes that Code, adds your deeply secret `client_secret` (which never reaches the browser), and makes a secure backend POST request to GitHub.\n5. GitHub verifies the secret and the code, and replies with an **Access Token**."
+      },
+      {
+        "type": "quiz",
+        "question": "During the OAuth flow, why does your server exchange the Authorization Code for an Access Token via a secure backend API call, rather than GitHub just giving the Access Token directly to the user's browser?",
+        "options": [
+          "Because Access Tokens are too large for URL parameters.",
+          "Because the browser cannot parse JSON.",
+          "Because exchanging the code requires your 'client_secret', which you must never expose to the front-end.",
+          "Because GitHub does not allow cross-origin requests."
+        ],
+        "answer": 2,
+        "explanation": "Your Client Secret password proves to GitHub that the request is genuinely from your server. If you put the Client Secret in the browser, anyone could steal it and impersonate your app."
+      }
+    ]
+  },
+  "3_1_multipart_files": {
+    "title": "Multipart Form Data (Deep Dive)",
+    "description": "Uploading Images and Boundaries.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "Why we need Multipart",
+        "content": "A standard `<form>` uses `application/x-www-form-urlencoded`. But if you want to upload a massive image file alongside a username and password, URL-encoding breaks down. Images are raw binary bytes, and URL-encoding strictly uses ASCII.\n\nTo solve this, we use `enctype=\"multipart/form-data\"`.\nThis tells the browser: 'I am sending multiple different parts of data. Some are text, some are binary.'"
+      },
+      {
+        "type": "concept",
+        "title": "The Boundary String",
+        "content": "When parsing multipart data on the backend, you must split the massive HTTP Body into individual pieces (e.g., the 'username' part and the 'profile_pic.png' part).\n\nTo do this, the browser generates a massive random string called a **Boundary**. It puts this boundary in the `Content-Type` header: \n`Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW`\n\nInside the body, the browser inserts this exact boundary string to separate the different fields. Your server literally reads the Content-Type, extracts the boundary string, and runs `.split(boundary.encode())` on the binary body."
+      },
+      {
+        "type": "quiz",
+        "question": "What happens if a user uploads a text file that magically contains the exact same text as the Browser's generated Boundary string?",
+        "options": [
+          "The server will freeze in an infinite loop.",
+          "The file uploads instantly.",
+          "The parser breaks because it mistakenly believes the file has ended and a new field has begun.",
+          "The browser detects it and crashes."
+        ],
+        "answer": 2,
+        "explanation": "If the boundary appears naturally in the payload data, it causes a collision and corrupts the parsing. This is why browsers generate massive, cryptographically random boundary strings to ensure a collision probability of virtually zero."
+      }
+    ]
+  },
+  "3_5_Buffers": {
+    "title": "Buffers & Binary Data",
+    "description": "Controlling the Matrix.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "TCP Streams vs HTTP Messages",
+        "content": "An HTTP message is a distinct block of data with a start and a finish (measured by Content-Length).\nBut TCP (the underlying protocol) doesn't know what HTTP is. TCP just streams raw bytes endlessly. \n\nWhen your Python/Node server calls `recv(1024)`, there is **no guarantee** that you receive the entirety of an HTTP request in one go. You might receive half the headers, and have to call `recv` again to get the rest. You must store all these incoming bytes in a **Buffer** until you have mathematically verified (via `\\r\\n\\r\\n` and `Content-Length`) that you have reached the end of the message."
+      },
+      {
+        "type": "quiz",
+        "question": "If your client sends a 5MB image over an HTTP POST request, is your server guaranteed to read the entire 5MB if you just call `.recv(1024)` in a loop until there is an empty string?",
+        "options": [
+          "Yes, because HTTP automatically concatenates packets.",
+          "Yes, unless the network drops.",
+          "No. A router in the middle might stall, causing `.recv` to return early. You must continually check the total bytes received against the `Content-Length` header.",
+          "No, images must be sent over UDP."
+        ],
+        "answer": 2,
+        "explanation": "TCP streaming is unpredictable. Packets arrive in bursts, and `.recv()` will return whatever bytes happen to be sitting in your computer's network card buffer at that exact microsecond. The ONLY way to know you are done is to count the bytes received and compare it strictly against the parsed `Content-Length` header."
+      }
+    ]
+  }
+}

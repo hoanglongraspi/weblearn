@@ -1,0 +1,166 @@
+{
+  "title": "CSE 312 Official 40-Point Mock Midterm",
+  "description": "Structured from the shared midterm breakdown, with the multiple-choice section restricted to the TopHat-style question bank.",
+  "totalPoints": 40,
+  "sections": [
+    {
+      "id": "mcq",
+      "title": "Section 1: Multiple Choice",
+      "type": "mcq",
+      "pointsPerQuestion": 1,
+      "questions": [
+        {
+          "q": "In which of the following situations does buffering NOT apply?",
+          "options": [
+            "When receiving large WebSocket frames",
+            "When receiving requests containing large file uploads",
+            "When receiving multiple WebSocket frames back-to-back",
+            "When receiving a GET request",
+            "When a user decides to register with a username that is 1,000,000 characters long"
+          ],
+          "answer": 3
+        },
+        {
+          "q": "Which of the following is NOT true about WebSocket frames?",
+          "options": [
+            "The payload can be masked using XOR",
+            "They have a maximum payload size on the order of exabytes",
+            "They have a fixed length",
+            "They require bit-level parsing to read",
+            "The payload will be masked when sent from the client, but not when sent from the server"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "The WebSocket handshake ensures that:",
+          "options": [
+            "A new connection using UDP for a WebSocket connection is created",
+            "The server understands the WebSocket protocol",
+            "A connection to reliably communicate over an unreliable network is established",
+            "A request-response connection is established",
+            "Nothing, since WebSocket connections are created automatically"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "It is guaranteed that you will always read the entire HTTP request after reading from the TCP socket a single time.",
+          "options": [
+            "False",
+            "True"
+          ],
+          "answer": 0
+        },
+        {
+          "q": "Which is NOT a way to process media in this class?",
+          "options": [
+            "Using ffmpeg with system calls",
+            "Using ffmpeg with an internal Python library",
+            "Using ffmpeg with Python bindings via an external library"
+          ],
+          "answer": 2
+        },
+        {
+          "q": "What is the most reliable way to determine the type of a file?",
+          "options": [
+            "Check the file extension",
+            "Assume the type of the file based on the path used to upload the file",
+            "All files are just bytes so the type never matters",
+            "Read the first bytes of the file to check the file signature",
+            "Check the Content-Type header"
+          ],
+          "answer": 3
+        },
+        {
+          "q": "What does Jesse recommend you do while writing your server code?",
+          "options": [
+            "Resign from CSE312",
+            "I am not taking this course seriously. Please just give me an F so I can move on with my life.",
+            "Do not write the method",
+            "Write tests and use the debugger if your tests do not pass",
+            "Pick option d because there is no fifth real answer"
+          ],
+          "answer": 3
+        },
+        {
+          "q": "Which of the following is NOT true about multipart/form-data HTTP requests?",
+          "options": [
+            "We receive requests of this type when an HTML form is submitted with enctype multipart/form-data",
+            "This format is required if we want to upload files via HTML form submissions",
+            "The entire request can always be decoded and parsed as a UTF-8 string",
+            "Each part is separated by a boundary found in the Content-Type header",
+            "Each form input is contained in a different part of the body with its own headers"
+          ],
+          "answer": 2
+        }
+      ]
+    },
+    {
+      "id": "short_answer",
+      "title": "Section 2: Short Answer",
+      "type": "rubric",
+      "pointsPerQuestion": 3,
+      "questions": [
+        {
+          "q": "Why do we use cookies in web apps? Explain the limitation of HTTP that makes cookies necessary.",
+          "rubric": "3 Points Total:\n[1 pt] Explicitly state that HTTP is stateless, so each request is handled independently.\n[1 pt] State that cookies give the browser/server a way to preserve or re-send state across requests.\n[1 pt] Give a concrete example such as authentication, remembering a session, or counting visits."
+        },
+        {
+          "q": "Explain the difference between the `Set-Cookie` header and the `Cookie` header.",
+          "rubric": "3 Points Total:\n[1 pt] `Set-Cookie` is sent by the server in a response to tell the browser to store a cookie.\n[1 pt] `Cookie` is sent by the browser in later requests to return previously stored cookies.\n[1 pt] Mention the one-cookie-per-`Set-Cookie` rule or the fact that the browser combines multiple cookies inside a single `Cookie` header."
+        },
+        {
+          "q": "Differentiate between session cookies and persistent cookies.",
+          "rubric": "3 Points Total:\n[1.5 pts] Session cookies are deleted when the browser session ends and do not have `Expires` or `Max-Age`.\n[1.5 pts] Persistent cookies survive browser restarts and are controlled by `Expires` or `Max-Age`."
+        },
+        {
+          "q": "How do the `HttpOnly` and `Secure` flags improve cookie security?",
+          "rubric": "3 Points Total:\n[1.5 pts] `HttpOnly` prevents JavaScript from reading the cookie, which helps defend against session theft through XSS.\n[1.5 pts] `Secure` restricts the cookie to HTTPS requests, reducing exposure over insecure transport."
+        }
+      ]
+    },
+    {
+      "id": "req_res",
+      "title": "Section 3: Request / Response Structure",
+      "type": "rubric",
+      "pointsPerQuestion": 2,
+      "questions": [
+        {
+          "q": "Write out a fully formatted HTTP/1.1 POST request from a plain HTML form submitting `username=bob&password=pass123` to `/login` on `localhost:8080`. Include the required headers for the body.",
+          "rubric": "2 Points Total:\n[1 pt] Correct request line and host header: `POST /login HTTP/1.1` and `Host: localhost:8080`.\n[1 pt] Includes `Content-Type: application/x-www-form-urlencoded`, `Content-Length: 29`, followed by `\\r\\n\\r\\n`, followed by the exact body `username=bob&password=pass123`."
+        },
+        {
+          "q": "Write out a fully formatted HTTP/1.1 response that redirects the browser to `/` and sets a session cookie named `session` equal to `abc123`.",
+          "rubric": "2 Points Total:\n[1 pt] Correct redirect response line and header: `HTTP/1.1 302 Found` and `Location: /`.\n[1 pt] Includes `Set-Cookie: session=abc123`, followed by `\\r\\n\\r\\n` (optionally with `Content-Length: 0`)."
+        }
+      ]
+    },
+    {
+      "id": "explain",
+      "title": "Section 4: Explain Concept",
+      "type": "rubric",
+      "pointsPerQuestion": 4,
+      "questions": [
+        {
+          "q": "Explain how cookies add state to an otherwise stateless HTTP system. Your answer should include `Set-Cookie`, `Cookie`, session vs persistent cookies, and at least one security concern or directive.",
+          "rubric": "4 Points Total:\n[1 pt] Explain that HTTP is stateless and cookies are used to attach state across requests.\n[1 pt] Mention the flow: the server sends `Set-Cookie`, and the browser later sends `Cookie` back.\n[1 pt] Differentiate session cookies from persistent cookies using `Expires` or `Max-Age`.\n[1 pt] Include at least one security concern or directive such as `HttpOnly`, `Secure`, XSS, or CSRF."
+        },
+        {
+          "q": "Explain what AJAX / `fetch` gives a web application and how it still fits into the normal HTTP request/response model.",
+          "rubric": "4 Points Total:\n[1 pt] State that AJAX / `fetch` allows the browser to make HTTP requests after the page has already loaded.\n[1 pt] Mention that this can happen without a full page reload, which enables more dynamic interfaces.\n[1 pt] Explain that these are still ordinary HTTP requests with methods, headers, and optional bodies.\n[1 pt] Give a practical example such as loading chat messages, updating part of a page, or submitting data asynchronously."
+        }
+      ]
+    },
+    {
+      "id": "code_review",
+      "title": "Section 5: Read Code (Bugs + Vulnerabilities)",
+      "type": "rubric",
+      "pointsPerQuestion": 8,
+      "questions": [
+        {
+          "q": "Read this Python snippet carefully. There are multiple bugs and vulnerabilities. Find at least 3 issues for full credit, and be ready to separate security problems from ordinary bugs.\n\n```python\n# Handles an incoming TCP request\ndef handle_request(client_socket):\n    request_data = client_socket.recv(1024).decode()\n    headers, body = request_data.split(\"\\r\\n\\r\\n\")\n\n    username = body.split(\"=\")[1]\n\n    db.execute(\"SELECT * FROM users WHERE user = '\" + username + \"'\")\n\n    response_body = \"<h1>Hello \" + username + \"</h1>\"\n    response = \"HTTP/1.1 200 OK\\r\\nContent-Length: \" + str(len(response_body)) + \"\\r\\n\\r\\n\" + response_body\n    client_socket.sendall(response.encode())\n```",
+          "rubric": "8 Points Total. Grade leniently if the student clearly identifies at least 3 structural flaws, with both security and bug awareness:\n\nSecurity findings:\n1. [Security - SQL Injection] The query concatenates untrusted `username` directly into SQL.\n2. [Security - XSS] The response reflects `username` directly into HTML without escaping.\n3. [Security - Missing Input Validation] The code trusts form input shape and contents without validation or sanitization.\n\nBug findings:\n4. [Bug - TCP Streaming] A single `recv(1024)` is not guaranteed to contain the full HTTP request.\n5. [Bug - Fragile Parsing] `split(\"\\r\\n\\r\\n\")` can crash if the delimiter has not fully arrived yet.\n6. [Bug - Wrong Content-Length Basis] `len(response_body)` counts Python characters, not UTF-8 bytes.\n7. [Bug - Unsafe Decode Assumption] Decoding the whole request before separating headers/body breaks binary uploads and other non-text bodies.\n\nFull credit expectation: finding any 3 strong issues, with at least one security-oriented observation and at least one correctness / parsing bug."
+        }
+      ]
+    }
+  ]
+}

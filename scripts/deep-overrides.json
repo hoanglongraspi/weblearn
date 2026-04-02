@@ -1,0 +1,139 @@
+{
+  "1_6_Cookies": {
+    "title": "Mastering Cookies (Deep Dive)",
+    "description": "Crucial Midterm Content: State, Directives, and Security.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### The Amnesia of HTTP\nHTTP is a **stateless** protocol. Imagine interacting with a cashier who instantly forgets who you are the moment you finish speaking. You ask for a burger, they give you a burger. You ask for fries, they ask 'Who are you paying for?'.\n\nTo build features like Authentication, where we remember a user across multiple visits, we need **State**. Since HTTP cannot do this natively, we use **Cookies**."
+      },
+      {
+        "type": "concept",
+        "title": "Set-Cookie vs Cookie Headers",
+        "content": "Cookies function purely through HTTP Headers (meaning they must be ASCII only).\n\n1. **Server tells Client to save a Cookie**:\nThe server includes the `Set-Cookie` header in its HTTP Response.\n`Set-Cookie: id=X6kAwpgW29M`\n\n*Crucial restriction*: Only 1 cookie is allowed per `Set-Cookie` header! To set 5 cookies, you must send 5 separate `Set-Cookie` headers.\n\n2. **Client sends Cookies to Server**:\nOn every subsequent request, the browser automatically sends back the data using the `Cookie` header.\n`Cookie: id=X6kAwpgW29M; visits=4`\n\n*Notice*: The browser sends ALL cookies separated by a semicolon `;` in a single `Cookie` header."
+      },
+      {
+        "type": "quiz",
+        "question": "If a server wants to set three different cookies on the user's browser, how must it format the HTTP Response?",
+        "options": [
+          "Include three separate `Set-Cookie` headers.",
+          "Include one `Set-Cookie` header with all three cookies separated by semicolons.",
+          "Include one `Cookie` header with all three cookies separated by semicolons.",
+          "It is impossible; HTTP only supports one cookie per session."
+        ],
+        "answer": 0,
+        "explanation": "To set multiple cookies, the server MUST send multiple `Set-Cookie` headers. By contrast, when the client replies, it squashes them all into a single `Cookie` header separated by semicolons."
+      },
+      {
+        "type": "concept",
+        "title": "Cookie Directives (Vital for Midterm)",
+        "content": "You can attach rules (directives) when setting a cookie by adding a semicolon after the value: `Set-Cookie: key=val; Directive`\n\n- **Expires**: The exact date/time it deletes.\n- **Max-Age**: Seconds until deletion.\n- **Session Cookies**: If NEITHER Expires nor Max-Age are set, the cookie deletes when the browser is completely closed.\n- **Secure**: Only sent over HTTPS, protecting from packet-sniffing on open WiFi.\n- **HttpOnly**: The cookie CANNOT be accessed by JavaScript (`document.cookie`). This entirely blocks XSS (Cross-Site Scripting) hijacking.\n- **SameSite**: Controls 3rd-party sending (`Lax`, `Strict`, `None`)."
+      },
+      {
+        "type": "quiz",
+        "question": "An attacker manages to inject malicious JavaScript into your webpage (an XSS attack). Which Cookie directive guarantees the attacker's script cannot steal the user's session token?",
+        "options": ["Secure", "SameSite=Strict", "HttpOnly", "Max-Age=0"],
+        "answer": 2,
+        "explanation": "HttpOnly strictly forbids JavaScript from reading the cookie, meaning even if an attacker executes code on the page, `document.cookie` will not reveal the session token."
+      }
+    ]
+  },
+  "2_4_Authentication": {
+    "title": "Authentication & Security (Deep Dive)",
+    "description": "Passwords, Hashing, Entropy, and Rainbow Tables.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "The Golden Rule of Passwords",
+        "content": "### NEVER STORE PASSWORDS AS PLAIN TEXT.\nEven site admins shouldn't know user passwords. If your database is compromised via SQL Injection, plain text passwords mean a total breach (and users reuse passwords everywhere!).\n\nInstead, we store a **Cryptographic Hash** (like SHA256). A hash is a one-way mathematical function. It is incredibly easy and fast to compute the hash, but practically impossible to reverse the hash back into plain text. You verify users by hashing their input and comparing it to the stored hash."
+      },
+      {
+        "type": "concept",
+        "title": "Attacking Hashes: Dictionary & Brute Force",
+        "content": "If we only store Hashes, how do attackers win?\n\n- **Brute Force**: Hash absolutely *every* possible combination of characters until the hashes match. The difficulty of this is measured by **Entropy** (bits of uncertainty). You need >=80 bits for security.\n- **Dictionary Attack**: Attackers know humans are lazy. Instead of brute forcing, they start by hashing millions of common dictionary words and common replacements (e.g., `pa$$w0rd`).\n- **Rainbow Tables**: Re-computing hashes takes time. A Rainbow Table is a colossal, pre-computed database of billions of plaintext-to-hash mappings, trading massive disk space for instant lookup time."
+      },
+      {
+        "type": "concept",
+        "title": "The Solution: Salting",
+        "content": "To defeat Rainbow Tables, we use **Salting**. \nA salt is a randomly generated string created when the user registers. \n\nWe append the Salt to the password, hash them together, and store BOTH the Plaintext Salt and the Hash in the database.\n\nBecause the salt is unique, the precomputed hashes in the attacker's Rainbow Table are entirely useless. (Bcrypt handles salting and hashing automatically)."
+      },
+      {
+        "type": "quiz",
+        "question": "Does Salting a password increase its Entropy (making it harder for a targeted brute-force attack)?",
+        "options": [
+          "Yes, because the total length of the password string is longer.",
+          "No, because the salt is stored in plain text right next to the hash.",
+          "Yes, because Rainbow tables are defeated.",
+          "No, because salts are usually too short."
+        ],
+        "answer": 1,
+        "explanation": "Salting ONLY defeats Rainbow Tables. Because the salt is stored in plain text in the database, an attacker performing a targeted Brute Force or Dictionary attack on that specific user simply reads the salt and applies it to their guesses. It adds absolutely zero entropy against targeted attacks."
+      },
+      {
+        "type": "concept",
+        "title": "Tracking User Sessions",
+        "content": "How do we combine Cookies and Auth to remember users?\n\n1. User logs in (hashes match).\n2. Server generates a massive, random **Secret Token**.\n3. Server stores `{ username: \"Guest\", token: \"fd933...\" }` in the Database.\n4. Server responds with `Set-Cookie: token=fd933...; HttpOnly; Secure`.\n5. On subsequent requests, the Server reads the `Cookie` header, looks up `fd933...` in the Database, and instantly knows it's \"Guest\"."
+      }
+    ]
+  },
+  "1_1_HTTP": {
+    "title": "HTTP 1.1: Comprehensive Overview",
+    "description": "Deep dive into the HyperText Transfer Protocol, requests, responses, and URLs.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### What is HTTP?\n**HTTP (HyperText Transfer Protocol)** is an Application Layer protocol that handles communication between your browser (Front End) and a Web Server (Back End). It is the foundation of data communication on the World Wide Web.\n\nWhile HTTP defines the *format* of the messages, it relies on lower-level protocols like **TCP** to handle the actual reliable transmission of data across the network.\n\nHTTP is defined extensively in **RFC2616** by the **IETF** (Internet Engineering Task Force). Whenever you have a question about how HTTP is supposed to work, RFC2616 is the absolute source of truth."
+      },
+      {
+        "type": "concept",
+        "title": "Anatomy of a URL",
+        "content": "Every HTTP request targets a specific **URL (Uniform Resource Locator)**. A URL consists of several distinct components:\n\n`Protocol://host:port/path?query_string#fragment`\n\n- **Protocol:** The scheme being used (e.g., `http`, `https`, `ftp`).\n- **Host:** The IP address or domain name (routes the request to the right machine).\n- **Port:** The TCP port number (`80` for HTTP, `443` for HTTPS by default).\n- **Path:** Specifies the exact resource on the server (`/images/cat.png`).\n- **Query String (Optional):** Key-value pairs passing extra data (`?q=web+development&ia=images`).\n- **Fragment (Optional):** Used purely by the browser to scroll to a specific section of the page (`#Definition`)."
+      },
+      {
+        "type": "concept",
+        "title": "The Server Response & Status Codes",
+        "content": "The server replies with a **Status Line** (e.g., `HTTP/1.1 200 OK`). Following the headers, there is a mandatory **Blank Line (`\\r\\n\\r\\n`)** that separates the headers from the Response Body. This blank line is crucial; without it, the browser doesn't know where the metadata ends and the actual content begins.\n\n**Common Status Code Families:**\n- **200s (Success):** The request was received, understood, and accepted.\n- **300s (Redirection):** Further action needs to be taken by the user agent. (Includes the `Location` header).\n- **400s (Client Error):** The client messed up. (e.g., `404 Not Found` if the path doesn't exist).\n- **500s (Server Error):** The server completely failed to fulfill an apparently valid request."
+      },
+      {
+        "type": "quiz",
+        "question": "If you are parsing an HTTP request and you encounter a blank line exactly consisting of `\\r\\n\\r\\n`, what does this signify?",
+        "options": [
+          "The connection has been dropped.",
+          "The end of the HTTP Headers and the immediate start of the Body.",
+          "An invalid request format.",
+          "The end of the entire message."
+        ],
+        "answer": 1,
+        "explanation": "The blank line `\\r\\n\\r\\n` is the standard HTTP delimiter that marks the definitive end of the headers. Any bytes that follow it belong to the body payload."
+      }
+    ]
+  },
+  "1_2_Encodings": {
+    "title": "Encodings & MIME Types: Bytes over the Wire",
+    "description": "Understanding how strictly typed bytes translate into text, imagery, and video.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "ASCII vs. UTF-8",
+        "content": "The original standard was **ASCII**, a 7-bit encoding that mapped English letters and symbols to exactly 128 numbers (e.g., 'A' is 65). Because it's 7-bit, an ASCII character always takes up exactly 1 Byte.\n\nThis broke down constantly when the web globalized. We needed a universal alphabet. Enter **UTF-8**, the modern standard encoding for web text.\n\n- **UTF-8** uses variable lengths: 1 to 4 bytes per character.\n- Characters like 'A' are 1 byte (meaning all ASCII strings are completely valid UTF-8).\n- Emojis, Cyrillic, or Kanji use 2 to 4 bytes.\n- When transmitting text over HTTP, you must convert it to a Byte Array using `.encode()` (which defaults to UTF-8 in Python) before sending."
+      },
+      {
+        "type": "concept",
+        "title": "The Danger of Content-Length",
+        "content": "When an HTTP request or response contains a Body, it **MUST** include a `Content-Length` header. This tells the receiver exactly how many bytes to read.\n\n**A Massive Trap for Developers:**\nIf you set `Content-Length` equal to the length of the string (e.g., `len(\"文字列\")`), you will introduce severe bugs. \nThe length of that string is 3 characters. But in UTF-8, characters take up to 4 bytes each. The actual size over the wire is 9 octets (bytes). \n\n**Rule:** Always convert your text to bytes FIRST (`content.encode()`), and *then* take the length of the byte array to set your `Content-Length`."
+      },
+      {
+        "type": "quiz",
+        "question": "What is the only valid encoding format allowed for HTTP Headers and the Request Line?",
+        "options": ["UTF-8", "UTF-16", "ASCII", "Base64"],
+        "answer": 2,
+        "explanation": "HTTP protocol definitions require that all HTTP headers and control lines be strictly encoded in ASCII. Only the body of the message can utilize complex encodings like UTF-8."
+      },
+      {
+        "type": "concept",
+        "title": "MIME Sniffing & Security Risks",
+        "content": "Modern browsers try to be completely foolproof. If your server sends an image but misses the `Content-Type` header, the browser will \"sniff\" the bytes, realize it's an image, and render it anyway. \n\n**The Security Hack:**\nImagine you run a site where users upload profile pictures. A malicious user uploads a script instead of an image. If your server blindly serves it, the browser might sniff the file, realize it's JavaScript, and execute it on another user's machine (Cross-Site Scripting).\n\n**The Fix:**\nAlways forcefully disable sniffing by including this header on your HTTP responses: \n`X-Content-Type-Options: nosniff`"
+      }
+    ]
+  }
+}

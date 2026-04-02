@@ -1,0 +1,34 @@
+{
+  "REC_10_HW4_websockets": {
+    "title": "Recitation: HW4 Tips (WebSockets)",
+    "description": "Reviewing Concurrency and Math for your assignments.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "The Framing Nightmare",
+        "content": "When doing HW4, the single biggest point of failure is **Bitwise Math** in Python/Node.\n- You cannot use normal string manipulation.\n- In Python, `bytearray` and `int.to_bytes` are your best friends.\n- Remember that the payload length dictates the offsets. If the length is `< 126`, your masking key starts at Byte 2. If the length is `126`, your masking key starts at Byte 4! You MUST calculate offsets dynamically, never hardcode them."
+      }
+    ]
+  },
+  "REC_2_HW1": {
+    "title": "Recitation: HW1 Tips (HTTP)",
+    "description": "Reminders on the CRLF trap.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "The Python .split() Trap",
+        "content": "In early assignments, students typically use `request.split(\"\\r\\n\\r\\n\")` to separate HTTP headers from the Body.\n\n**CRITICAL FLAW**: If a user uploads an image (which is raw binary data), that image might randomly contain the binary equivalent of `\\r\\n\\r\\n` directly inside its pixels! If you split the entire request strictly as a string, you will rip the image file in half.\n\n**Fix**: You must safely split exactly ONCE at the first occurrence of `\\r\\n\\r\\n` and treat the remainder exclusively as raw bytes."
+      }
+    ]
+  },
+  "REC_MT_REVIEW": {
+    "title": "Mega Midterm Capstone",
+    "description": "The Final Checklist. You are ready.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### You have reached the end.\nEvery slide, every quirk, every bitwise operation, and every HTTP constraint has been fully deeply covered in this application.\n\nRun through the Quizzes on Cookies, APIs, XSRF, Databases, Docker, and WebSockets. If you understand the difference between Idempotency in POST and PUT, the difference between Encryption and Hashing, and how to verify a WebSocket upgrade using SHA-1... you will get a 100 on the exam."
+      }
+    ]
+  }
+}

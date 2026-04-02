@@ -1,0 +1,34 @@
+{
+  "1_5_API": {
+    "title": "RESTful APIs & CRUD",
+    "description": "How the Front End talks to the Database.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### The Waiter in the Restaurant\nOnce you have a Database (the Kitchen) and a Client (the Customer), you need someone to take the orders and deliver the food. This is the **API (Application Programming Interface)**.\n\nWithout an API, the client would have to directly run SQL commands on your database, which is a massive security risk. Instead, the API provides a strict, safe menu of operations the client is allowed to perform."
+      },
+      {
+        "type": "concept",
+        "title": "CRUD Operations",
+        "content": "Every major data interaction maps to four basic operations, known as **CRUD**:\n- **Create**: Insert new data (e.g., registering an account). Mapped to HTTP `POST`.\n- **Retrieve**: Read existing data (e.g., viewing a profile). Mapped to HTTP `GET`.\n- **Update**: Modify existing data (e.g., changing a password). Mapped to HTTP `PUT` or `PATCH`.\n- **Delete**: Remove data. Mapped to HTTP `DELETE`.\n\n*(Note: In the real world, we rarely structurally delete data; we perform 'Soft Deletes' by setting an `is_deleted = true` flag in the database to preserve history.)*"
+      },
+      {
+        "type": "concept",
+        "title": "Idempotency",
+        "content": "A crucial engineering concept in APIs is **Idempotency**.\nIf an operation is idempotent, it means running the exact same request 100 times has the exact same effect on the server as running it 1 time. $f(f(x)) = f(x)$.\n\n- **GET**: Idempotent. Asking for a profile 100 times doesn't change the profile.\n- **DELETE**: Idempotent. Deleting an account 100 times just means it's deleted.\n- **PUT**: Idempotent. Replacing a profile picture with Image A 100 times leaves Image A as the picture.\n- **POST**: NOT Idempotent. Submitting a 'Create Account' request 100 times will result in 100 different accounts being created."
+      },
+      {
+        "type": "quiz",
+        "question": "Which of these HTTP Requests is intrinsically NOT Idempotent?",
+        "options": ["GET", "DELETE", "POST", "PUT"],
+        "answer": 2,
+        "explanation": "POST is completely unpredictable from the protocol's perspective. The server processes the input to create a brand new state on every request, usually resulting in a new database row being generated each time."
+      },
+      {
+        "type": "concept",
+        "title": "RESTful Constraints",
+        "content": "A wildly popular methodology for designing APIs is **REST (REpresentational State Transfer)**. An API is \"RESTful\" if it strictly follows HTTP semantics (e.g., using `DELETE /user/5` instead of `POST /delete_user?id=5`).\n\nCore REST Constraints include:\n- **Client-Server Architecture**: The UI is totally separated from data storage.\n- **Statelessness**: Every request must contain all the info needed to process it. The server shouldn't remember preceding requests in an open session.\n- **Cacheability**: Responses should explicitly say if they can be cached to save bandwidth.\n- **Layered System**: The client doesn't know if it's hitting the real server, a load balancer, or a cache."
+      }
+    ]
+  }
+}

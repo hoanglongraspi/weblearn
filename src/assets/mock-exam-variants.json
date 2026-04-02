@@ -1,0 +1,857 @@
+[
+    {
+        "variantId": "A",
+        "title": "CSE 312 Mock Midterm — Variant A",
+        "description": "Covers HTTP parsing, cookies, authentication, and server security patterns from HW1–HW3.",
+        "totalPoints": 40,
+        "sections": [
+            {
+                "id": "mcq",
+                "title": "Section 1: Multiple Choice",
+                "type": "mcq",
+                "pointsPerQuestion": 1,
+                "questions": [
+                    {
+                        "q": "In which of the following situations does buffering NOT apply?",
+                        "options": [
+                            "When receiving large WebSocket frames",
+                            "When receiving requests containing large file uploads",
+                            "When receiving multiple WebSocket frames back-to-back",
+                            "When receiving a GET request with no body",
+                            "When a user registers with a 1,000,000-character username"
+                        ],
+                        "answer": 3
+                    },
+                    {
+                        "q": "Which of the following is NOT true about WebSocket frames?",
+                        "options": [
+                            "The payload can be masked using XOR",
+                            "They have a maximum payload size on the order of exabytes",
+                            "They have a variable length that must be parsed",
+                            "They require bit-level parsing to read",
+                            "The payload will be masked when sent from the client, but not from the server"
+                        ],
+                        "answer": 1
+                    },
+                    {
+                        "q": "The WebSocket handshake ensures that:",
+                        "options": [
+                            "A new UDP connection is created for WebSocket",
+                            "The server understands the WebSocket protocol",
+                            "A connection over an unreliable network is established",
+                            "A request-response cycle is established",
+                            "Nothing — WebSocket connections are created automatically"
+                        ],
+                        "answer": 1
+                    },
+                    {
+                        "q": "It is guaranteed that you will always read the entire HTTP request after a single recv() call.",
+                        "options": [
+                            "False",
+                            "True"
+                        ],
+                        "answer": 0
+                    },
+                    {
+                        "q": "Which is NOT a way to process media in this class?",
+                        "options": [
+                            "Using ffmpeg with system calls",
+                            "Using ffmpeg with an internal Python library",
+                            "Using ffmpeg with Python bindings via an external library"
+                        ],
+                        "answer": 1
+                    },
+                    {
+                        "q": "What is the most reliable way to determine the type of a file?",
+                        "options": [
+                            "Check the file extension",
+                            "Assume the type based on the upload path",
+                            "All files are just bytes — type never matters",
+                            "Read the first bytes of the file to check its magic number / file signature",
+                            "Check the Content-Type header sent by the client"
+                        ],
+                        "answer": 3
+                    },
+                    {
+                        "q": "Which cookie directive prevents JavaScript from reading a cookie?",
+                        "options": [
+                            "Secure",
+                            "SameSite",
+                            "HttpOnly",
+                            "Path",
+                            "Max-Age"
+                        ],
+                        "answer": 2
+                    },
+                    {
+                        "q": "Which of the following is NOT true about multipart/form-data HTTP requests?",
+                        "options": [
+                            "We receive them when an HTML form uses enctype='multipart/form-data'",
+                            "This format is required for file uploads via HTML form submissions",
+                            "The entire request can always be decoded and parsed as a UTF-8 string",
+                            "Each part is separated by a boundary declared in Content-Type",
+                            "Each form field is contained in a different part with its own headers"
+                        ],
+                        "answer": 2
+                    }
+                ]
+            },
+            {
+                "id": "short_answer",
+                "title": "Section 2: Short Answer",
+                "type": "rubric",
+                "pointsPerQuestion": 3,
+                "questions": [
+                    {
+                        "q": "Why do we use cookies in web apps? Explain the limitation of HTTP that makes cookies necessary.",
+                        "rubric": "3 Points Total:\n[1 pt] Explicitly state that HTTP is stateless, so each request is handled independently.\n[1 pt] State that cookies give the browser/server a way to preserve or re-send state across requests.\n[1 pt] Give a concrete example such as authentication, remembering a session, or counting visits."
+                    },
+                    {
+                        "q": "Explain the difference between the `Set-Cookie` response header and the `Cookie` request header.",
+                        "rubric": "3 Points Total:\n[1 pt] `Set-Cookie` is sent by the server in a response to tell the browser to store a cookie.\n[1 pt] `Cookie` is sent by the browser in later requests to return previously stored cookies.\n[1 pt] Mention the one-cookie-per-Set-Cookie rule or that the browser combines multiple cookies in one Cookie header."
+                    },
+                    {
+                        "q": "Differentiate between session cookies and persistent cookies.",
+                        "rubric": "3 Points Total:\n[1.5 pts] Session cookies are deleted when the browser session ends and do not have Expires or Max-Age.\n[1.5 pts] Persistent cookies survive browser restarts and are controlled by Expires or Max-Age."
+                    },
+                    {
+                        "q": "How do the `HttpOnly` and `Secure` flags improve cookie security?",
+                        "rubric": "3 Points Total:\n[1.5 pts] HttpOnly prevents JavaScript from reading the cookie, defending against session theft via XSS.\n[1.5 pts] Secure restricts the cookie to HTTPS requests, reducing exposure over insecure transport."
+                    }
+                ]
+            },
+            {
+                "id": "req_res",
+                "title": "Section 3: Request / Response Structure",
+                "type": "rubric",
+                "pointsPerQuestion": 2,
+                "questions": [
+                    {
+                        "q": "Write a fully formatted HTTP/1.1 POST request from a plain HTML form submitting `username=bob&password=pass123` to `/login` on `localhost:8080`. Include the required headers for the body.",
+                        "rubric": "2 Points Total:\n[1 pt] Correct request line and Host header: POST /login HTTP/1.1 and Host: localhost:8080.\n[1 pt] Includes Content-Type: application/x-www-form-urlencoded, Content-Length: 29, followed by \\r\\n\\r\\n, then the exact body username=bob&password=pass123."
+                    },
+                    {
+                        "q": "Write a fully formatted HTTP/1.1 response that redirects the browser to `/` and sets a persistent auth cookie named `auth_token`.",
+                        "rubric": "2 Points Total:\n[1 pt] Correct redirect status and header: HTTP/1.1 302 Found and Location: /.\n[1 pt] Includes Set-Cookie: auth_token=<value>; Max-Age=<positive>; HttpOnly, followed by \\r\\n\\r\\n."
+                    }
+                ]
+            },
+            {
+                "id": "explain",
+                "title": "Section 4: Explain Concept",
+                "type": "rubric",
+                "pointsPerQuestion": 4,
+                "questions": [
+                    {
+                        "q": "Explain how cookies add state to an otherwise stateless HTTP system. Your answer should include `Set-Cookie`, `Cookie`, session vs persistent cookies, and at least one security concern or directive.",
+                        "rubric": "4 Points Total:\n[1 pt] Explain that HTTP is stateless and cookies are used to attach state across requests.\n[1 pt] Mention the flow: the server sends Set-Cookie, and the browser later sends Cookie back.\n[1 pt] Differentiate session cookies from persistent cookies using Expires or Max-Age.\n[1 pt] Include at least one security concern or directive such as HttpOnly, Secure, XSS, or CSRF."
+                    },
+                    {
+                        "q": "Explain what AJAX / `fetch` gives a web application and how it still fits into the normal HTTP request/response model.",
+                        "rubric": "4 Points Total:\n[1 pt] State that AJAX/fetch allows the browser to make HTTP requests after the page has already loaded.\n[1 pt] Mention that this can happen without a full page reload, enabling more dynamic interfaces.\n[1 pt] Explain that these are still ordinary HTTP requests with methods, headers, and optional bodies.\n[1 pt] Give a practical example such as loading chat messages or submitting data asynchronously."
+                    }
+                ]
+            },
+            {
+                "id": "code_review",
+                "title": "Section 5: Read Code (Bugs + Vulnerabilities)",
+                "type": "rubric",
+                "pointsPerQuestion": 8,
+                "questions": [
+                    {
+                        "q": "Read this Python server snippet carefully. There are multiple bugs and security vulnerabilities. Find at least 3 issues for full credit.\n\n```python\n# POST /api/chats  — create a chat message\ndef handle_create_chat(request, handler):\n    data = json.loads(request.body)\n    content = data[\"content\"]\n    author = \"Guest\"\n\n    if \"session\" in request.cookies:\n        doc = db.users.find_one({\"session\": request.cookies[\"session\"]})\n        if doc:\n            author = doc[\"username\"]\n\n    message = {\n        \"id\": str(uuid.uuid4()),\n        \"author\": author,\n        \"content\": content,\n        \"updated\": False\n    }\n    db.chats.insert_one(message)\n\n    response = Response()\n    response.text(\"<b>\" + content + \"</b>\")\n    handler.send_all(response.to_data())\n```",
+                        "rubric": "8 Points Total. Award up to 8 points for clearly identifying at least 3 of the following issues:\n\nSecurity findings:\n1. [XSS] The content is reflected directly back in an HTML <b> tag without escaping. A user who submits `<script>alert(1)</script>` as content will have it executed in other users' browsers.\n2. [Missing session validation] The session cookie value is used as a direct MongoDB query field without hashing or any integrity check. An attacker who guesses or obtains a session ID gains full access.\n3. [No Content-Type set] The response body contains HTML but no Content-Type: text/html header is set. Combined with MIME sniffing, this can cause unexpected rendering.\n\nBug findings:\n4. [No input validation] The code does not check whether 'content' exists in data or whether the body is even valid JSON. A malformed request will raise an uncaught exception.\n5. [No new session cookie issued] If the user does not have a session cookie, no cookie is set in the response. The spec requires the server to set a session cookie when a guest sends their first message.\n6. [String concatenation for HTML] Using string concatenation to build an HTML response is fragile and error-prone — it bypasses any content-length calculation if to_data() measures bytes vs characters."
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "variantId": "B",
+        "title": "CSE 312 Mock Midterm — Variant B",
+        "description": "Emphasizes authentication flows, token security, and multipart parsing from HW2–HW3.",
+        "totalPoints": 40,
+        "sections": [
+            {
+                "id": "mcq",
+                "title": "Section 1: Multiple Choice",
+                "type": "mcq",
+                "pointsPerQuestion": 1,
+                "questions": [
+                    {
+                        "q": "When implementing bcrypt to hash passwords, which of the following is true?",
+                        "options": [
+                            "Bcrypt produces a deterministic hash for the same input every time",
+                            "The salt is embedded in the bcrypt output string, so you do not need to store it separately",
+                            "Bcrypt is a symmetric encryption algorithm",
+                            "Bcrypt cannot be used with Python",
+                            "Bcrypt hashes should be stored after a second SHA-256 pass"
+                        ],
+                        "answer": 1
+                    },
+                    {
+                        "q": "Which HTTP status code should be returned when a user tries to delete another user's chat message?",
+                        "options": [
+                            "400 Bad Request",
+                            "401 Unauthorized",
+                            "403 Forbidden",
+                            "404 Not Found",
+                            "409 Conflict"
+                        ],
+                        "answer": 2
+                    },
+                    {
+                        "q": "Which of the following is true about auth tokens in HW2?",
+                        "options": [
+                            "The plaintext token is stored in MongoDB",
+                            "A salted hash of the token is stored in MongoDB",
+                            "An unsalted hash of the token is stored in MongoDB",
+                            "The token is stored in a file on disk",
+                            "Tokens never expire"
+                        ],
+                        "answer": 2
+                    },
+                    {
+                        "q": "What does the `HttpOnly` directive on a cookie prevent?",
+                        "options": [
+                            "The cookie from being sent over HTTP (non-HTTPS) connections",
+                            "The server from reading the cookie",
+                            "JavaScript running on the page from accessing the cookie",
+                            "The browser from storing the cookie",
+                            "CSRF attacks"
+                        ],
+                        "answer": 2
+                    },
+                    {
+                        "q": "In the multipart/form-data format, what separates each part of the body?",
+                        "options": [
+                            "A newline character",
+                            "A boundary string prefixed with -- declared in the Content-Type header",
+                            "A null byte",
+                            "The string 'PART-SEPARATOR'",
+                            "A blank line"
+                        ],
+                        "answer": 1
+                    },
+                    {
+                        "q": "What is percent-encoding used for in HTTP?",
+                        "options": [
+                            "Compressing large request bodies",
+                            "Encoding binary files for upload",
+                            "Safely encoding special characters in URLs and form data",
+                            "Encrypting passwords before sending",
+                            "Chunking transfer encoding"
+                        ],
+                        "answer": 2
+                    },
+                    {
+                        "q": "Which of the following best describes the purpose of the `X-Content-Type-Options: nosniff` header?",
+                        "options": [
+                            "Prevents cross-site request forgery",
+                            "Prevents the browser from guessing the MIME type and instead trusts the declared Content-Type",
+                            "Prevents JavaScript from reading response headers",
+                            "Prevents caching of sensitive pages",
+                            "Enables HTTPS-only communication"
+                        ],
+                        "answer": 1
+                    },
+                    {
+                        "q": "When parsing a multipart body, the content of a part must be treated as:",
+                        "options": [
+                            "Always a UTF-8 string",
+                            "Always JSON",
+                            "Raw bytes, since binary files may be embedded",
+                            "URL-encoded form data",
+                            "A base64-encoded string"
+                        ],
+                        "answer": 2
+                    }
+                ]
+            },
+            {
+                "id": "short_answer",
+                "title": "Section 2: Short Answer",
+                "type": "rubric",
+                "pointsPerQuestion": 3,
+                "questions": [
+                    {
+                        "q": "What is password salting, and why is it important even when using a strong hashing algorithm?",
+                        "rubric": "3 Points Total:\n[1 pt] A salt is a unique random value added to each password before hashing.\n[1 pt] It ensures two users with the same password produce different hashes, preventing rainbow-table attacks.\n[1 pt] Without salting, an attacker who obtains the hash database can precompute hashes for common passwords and look them up instantly."
+                    },
+                    {
+                        "q": "Explain why auth tokens must be hashed before being stored in the database, even though they are not passwords.",
+                        "rubric": "3 Points Total:\n[1 pt] If the database is breached, storing plaintext tokens gives the attacker immediate access to all active sessions.\n[1 pt] A hash means the attacker only obtains the hash, not the token, so they cannot directly replay it.\n[1 pt] No salt is required because tokens are already high-entropy random values, unlike passwords."
+                    },
+                    {
+                        "q": "What is XSS (Cross-Site Scripting), and how does HTML escaping prevent it in a chat app?",
+                        "rubric": "3 Points Total:\n[1 pt] XSS is when a malicious user injects script tags or HTML into content that is then rendered by other users' browsers.\n[1 pt] The injected script runs in the context of the page and can steal cookies, redirect users, or modify page content.\n[1 pt] HTML escaping converts characters like < > & into their safe entity equivalents so they display as text rather than being parsed as HTML."
+                    },
+                    {
+                        "q": "Explain what happens during the WebSocket upgrade handshake at the HTTP level.",
+                        "rubric": "3 Points Total:\n[1 pt] The client sends an HTTP GET request with Upgrade: websocket and Connection: Upgrade headers, plus a Sec-WebSocket-Key.\n[1 pt] The server responds with 101 Switching Protocols, Upgrade: websocket, and Sec-WebSocket-Accept derived from the key.\n[1 pt] After the handshake, the same TCP connection is reused for bidirectional WebSocket frame exchange — no new connection is opened."
+                    }
+                ]
+            },
+            {
+                "id": "req_res",
+                "title": "Section 3: Request / Response Structure",
+                "type": "rubric",
+                "pointsPerQuestion": 2,
+                "questions": [
+                    {
+                        "q": "Write the HTTP/1.1 request line, headers, and body for a PATCH request sent to `/api/chats/42` with JSON body `{\"content\": \"edited\"}` from a logged-in user with auth token `tok123`.",
+                        "rubric": "2 Points Total:\n[1 pt] Correct request line: PATCH /api/chats/42 HTTP/1.1, plus Content-Type: application/json and Content-Length: 20.\n[1 pt] Cookie: auth_token=tok123 header present, followed by \\r\\n\\r\\n and body {\"content\": \"edited\"}."
+                    },
+                    {
+                        "q": "Write the HTTP/1.1 response your server sends when a user successfully registers. Include the status line and at minimum two relevant headers.",
+                        "rubric": "2 Points Total:\n[1 pt] Status line: HTTP/1.1 200 OK.\n[1 pt] Includes Content-Type and Content-Length (or Transfer-Encoding) headers, and optionally X-Content-Type-Options: nosniff. Body may be a short confirmation string."
+                    }
+                ]
+            },
+            {
+                "id": "explain",
+                "title": "Section 4: Explain Concept",
+                "type": "rubric",
+                "pointsPerQuestion": 4,
+                "questions": [
+                    {
+                        "q": "Explain the full login flow from the moment a user submits the login form to the moment they can access a protected resource. Include credential validation, token issuance, and cookie behavior.",
+                        "rubric": "4 Points Total:\n[1 pt] The browser sends a POST request with url-encoded username and password in the body.\n[1 pt] The server looks up the user, hashes the provided password, and compares against the stored bcrypt hash.\n[1 pt] On success, the server generates a high-entropy auth token, stores a hash of it in the DB, and sends it as an HttpOnly persistent cookie.\n[1 pt] On subsequent requests the browser sends Cookie: auth_token=<token>; the server hashes the token and compares with the DB entry to authenticate."
+                    },
+                    {
+                        "q": "Explain why the Content-Length header is critical in HTTP and what problems arise if it is calculated incorrectly.",
+                        "rubric": "4 Points Total:\n[1 pt] Content-Length tells the receiver exactly how many bytes constitute the body of the message.\n[1 pt] Without it, the receiver has no way to know when the body ends, causing hangs or truncation.\n[1 pt] If calculated on Python str length rather than bytes length, multi-byte UTF-8 characters (e.g. emoji) will produce an incorrect value.\n[1 pt] An incorrect value can cause the browser to truncate content, display garbage, or break keep-alive pipelining."
+                    }
+                ]
+            },
+            {
+                "id": "code_review",
+                "title": "Section 5: Read Code (Bugs + Vulnerabilities)",
+                "type": "rubric",
+                "pointsPerQuestion": 8,
+                "questions": [
+                    {
+                        "q": "Read this Python login handler carefully. There are multiple bugs and security vulnerabilities. Find at least 3 issues for full credit.\n\n```python\n# POST /login\ndef handle_login(request, handler):\n    body = request.body.decode()\n    parts = body.split(\"&\")\n    username = parts[0].split(\"=\")[1]\n    password = parts[1].split(\"=\")[1]\n\n    user = db.users.find_one({\"username\": username})\n\n    if user and user[\"password\"] == password:\n        token = str(uuid.uuid4())\n        db.users.update_one(\n            {\"username\": username},\n            {\"$set\": {\"auth_token\": token}}\n        )\n        response = Response()\n        response.set_status(200, \"OK\")\n        response.cookies({\"auth_token\": token})\n        handler.send_all(response.to_data())\n    else:\n        response = Response()\n        response.set_status(400, \"Bad Request\")\n        response.text(\"Login failed\")\n        handler.send_all(response.to_data())\n```",
+                        "rubric": "8 Points Total. Award up to 8 points for clearly identifying at least 3 of the following issues:\n\nSecurity findings:\n1. [Plaintext password comparison] The code compares user[\"password\"] == password directly, meaning passwords are stored as plaintext in MongoDB. Correct approach: use bcrypt.checkpw().\n2. [Auth token stored in plaintext] The raw token string is stored in MongoDB. A database breach reveals all active tokens. The token hash (no salt needed) should be stored instead.\n3. [Missing HttpOnly directive] The auth_token cookie is set without the HttpOnly directive, allowing JavaScript to steal the cookie via XSS.\n\nBug findings:\n4. [Fragile URL decoding] The manual split on '&' and '=' does not handle percent-encoded characters. A password like 'p%40ss' will not be decoded correctly and login will fail even with the correct password.\n5. [No validation that parts exist] If the body is malformed (e.g. missing '&'), indexing parts[1] will raise an IndexError and crash the server.\n6. [Session cookie not persistent] No Max-Age or Expires directive is set, so the cookie is a session cookie that disappears when the browser is closed, contradicting the HW2 spec."
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "variantId": "C",
+        "title": "CSE 312 Mock Midterm — Variant C",
+        "description": "Focuses on routing logic, static file serving, path traversal, and HTTP security headers from HW1.",
+        "totalPoints": 40,
+        "sections": [
+            {
+                "id": "mcq",
+                "title": "Section 1: Multiple Choice",
+                "type": "mcq",
+                "pointsPerQuestion": 1,
+                "questions": [
+                    {
+                        "q": "In HW1, what does the `exact_path=True` flag on `add_route` mean?",
+                        "options": [
+                            "The route is case-sensitive",
+                            "The request path must begin with the route path",
+                            "The request path must match the route path exactly",
+                            "The route only accepts GET requests",
+                            "The route applies to all HTTP methods"
+                        ],
+                        "answer": 2
+                    },
+                    {
+                        "q": "Which of the following Content-Type values should be used when serving a .mp4 file?",
+                        "options": [
+                            "video/webm",
+                            "application/octet-stream",
+                            "video/mp4",
+                            "audio/mpeg",
+                            "image/gif"
+                        ],
+                        "answer": 2
+                    },
+                    {
+                        "q": "What security header must be sent on every response to prevent browsers from guessing file types?",
+                        "options": [
+                            "Content-Security-Policy",
+                            "X-Frame-Options",
+                            "X-Content-Type-Options: nosniff",
+                            "Strict-Transport-Security",
+                            "Referrer-Policy"
+                        ],
+                        "answer": 2
+                    },
+                    {
+                        "q": "What is the correct response status code for a resource that cannot be found?",
+                        "options": [
+                            "400",
+                            "401",
+                            "403",
+                            "404",
+                            "500"
+                        ],
+                        "answer": 3
+                    },
+                    {
+                        "q": "When rendering a page using layout.html and a content file in HW1, what string is replaced?",
+                        "options": [
+                            "{{page}}",
+                            "{{body}}",
+                            "{{content}}",
+                            "{{html}}",
+                            "<!-- insert -->"
+                        ],
+                        "answer": 2
+                    },
+                    {
+                        "q": "Which HTTP method is used to partially update a resource (e.g., edit a chat message)?",
+                        "options": [
+                            "PUT",
+                            "POST",
+                            "DELETE",
+                            "PATCH",
+                            "UPDATE"
+                        ],
+                        "answer": 3
+                    },
+                    {
+                        "q": "Which Python class is the correct return type of parse_multipart() in HW3?",
+                        "options": [
+                            "A dict with boundary and parts keys",
+                            "A list of part objects",
+                            "An object with boundary and parts fields (from a custom class)",
+                            "A JSON string",
+                            "A tuple of (boundary, list)"
+                        ],
+                        "answer": 2
+                    },
+                    {
+                        "q": "In HTTP, which header tells the browser how many bytes to read for the response body?",
+                        "options": [
+                            "Transfer-Encoding",
+                            "Content-Length",
+                            "Content-Type",
+                            "Body-Size",
+                            "Payload-Length"
+                        ],
+                        "answer": 1
+                    }
+                ]
+            },
+            {
+                "id": "short_answer",
+                "title": "Section 2: Short Answer",
+                "type": "rubric",
+                "pointsPerQuestion": 3,
+                "questions": [
+                    {
+                        "q": "What is a path traversal attack, and how should a file-serving endpoint guard against it?",
+                        "rubric": "3 Points Total:\n[1 pt] Path traversal is when an attacker uses sequences like ../../ in a URL to read files outside the intended directory.\n[1 pt] An attacker could access /etc/passwd or server configuration files by requesting /public/../../etc/passwd.\n[1 pt] Guard against it by resolving the full path with os.path.realpath and verifying it starts with the expected base directory before opening the file."
+                    },
+                    {
+                        "q": "Explain why the body of an HTTP request must be handled as bytes rather than decoded to a string immediately.",
+                        "rubric": "3 Points Total:\n[1 pt] Binary files (images, videos) cannot be decoded as UTF-8 — decoding them will corrupt or raise an error.\n[1 pt] Decoding the entire request before splitting headers/body can corrupt binary bodies if a byte sequence is not valid UTF-8.\n[1 pt] The correct approach is to find the first b'\\r\\n\\r\\n' in bytes, treat everything after as the body bytes, and only decode the headers portion."
+                    },
+                    {
+                        "q": "What are the three parts of an HTTP/1.1 request line, and what does each contain?",
+                        "rubric": "3 Points Total:\n[1 pt] The HTTP method (e.g. GET, POST, PATCH, DELETE).\n[1 pt] The request path/URL (e.g. /api/chats or /public/style.css).\n[1 pt] The HTTP version string (always HTTP/1.1 in this course), each part separated by a space."
+                    },
+                    {
+                        "q": "Explain the difference between encoding and encryption. Give one example of each in the context of web development.",
+                        "rubric": "3 Points Total:\n[1 pt] Encoding transforms data into a different format for transmission/storage but is reversible without a key (e.g. base64, percent-encoding, UTF-8).\n[1 pt] Encryption transforms data so it can only be reversed with a secret key (e.g. AES, TLS).\n[1 pt] A strong example of each: percent-encoding of a URL (encoding) vs. HTTPS/TLS protecting data in transit (encryption)."
+                    }
+                ]
+            },
+            {
+                "id": "req_res",
+                "title": "Section 3: Request / Response Structure",
+                "type": "rubric",
+                "pointsPerQuestion": 2,
+                "questions": [
+                    {
+                        "q": "Write the full HTTP/1.1 response your server sends when serving `public/imgs/logo.png`. Include the correct status line and all required headers.",
+                        "rubric": "2 Points Total:\n[1 pt] Status line: HTTP/1.1 200 OK, with Content-Type: image/png.\n[1 pt] Includes Content-Length equal to the number of bytes in the file, X-Content-Type-Options: nosniff, and the binary body after \\r\\n\\r\\n."
+                    },
+                    {
+                        "q": "Write the full HTTP/1.1 response for a 404 error when a client requests `/api/does-not-exist`.",
+                        "rubric": "2 Points Total:\n[1 pt] Status line: HTTP/1.1 404 Not Found.\n[1 pt] Includes Content-Type: text/plain; charset=utf-8 and Content-Length with a plain-text body explaining the resource was not found."
+                    }
+                ]
+            },
+            {
+                "id": "explain",
+                "title": "Section 4: Explain Concept",
+                "type": "rubric",
+                "pointsPerQuestion": 4,
+                "questions": [
+                    {
+                        "q": "Explain how TCP streaming affects HTTP request parsing in Python. What can go wrong with a naive implementation, and how do you fix it?",
+                        "rubric": "4 Points Total:\n[1 pt] TCP is a stream protocol — data may arrive in arbitrary chunks, not necessarily one full request per recv().\n[1 pt] A naive recv(4096) may return only part of the HTTP request; constructing a Request object from it will fail or produce corrupt data.\n[1 pt] For the headers: keep buffering until \\r\\n\\r\\n is seen. Then read Content-Length additional bytes into the body.\n[1 pt] Failure to buffer properly causes silent data loss, crashes on large uploads, and security issues if an attacker sends a slow request."
+                    },
+                    {
+                        "q": "Explain how the Router class works in HW1, including how exact_path and route ordering affect which handler is called.",
+                        "rubric": "4 Points Total:\n[1 pt] Routes are registered with add_route(method, path, handler, exact_path=False).\n[1 pt] When a request arrives, route_request iterates through registered routes to find the first match.\n[1 pt] If exact_path=True, the request path must equal the route path exactly. If False, the request path must start with the route path.\n[1 pt] The first matching route wins, so more specific routes should be registered before broader prefix routes to avoid being shadowed."
+                    }
+                ]
+            },
+            {
+                "id": "code_review",
+                "title": "Section 5: Read Code (Bugs + Vulnerabilities)",
+                "type": "rubric",
+                "pointsPerQuestion": 8,
+                "questions": [
+                    {
+                        "q": "Read this static file-serving handler carefully. There are multiple bugs and security vulnerabilities. Find at least 3 issues for full credit.\n\n```python\n# Handles GET /public/<anything>\ndef serve_file(request, handler):\n    path = request.path  # e.g. /public/imgs/dog.jpg\n    file_path = \".\" + path  # => ./public/imgs/dog.jpg\n\n    with open(file_path, \"rb\") as f:\n        content = f.read()\n\n    ext = path.split(\".\")[-1]\n    mime_types = {\n        \"html\": \"text/html\",\n        \"css\":  \"text/css\",\n        \"js\":   \"application/javascript\",\n        \"png\":  \"image/png\",\n        \"jpg\":  \"image/jpg\"\n    }\n    content_type = mime_types.get(ext, \"text/plain\")\n\n    response = Response()\n    response.headers({\"Content-Type\": content_type})\n    response.bytes(content)\n    handler.send_all(response.to_data())\n```",
+                        "rubric": "8 Points Total. Award up to 8 points for clearly identifying at least 3 of the following issues:\n\nSecurity findings:\n1. [Path Traversal] The path is concatenated directly without validation. A request for /public/../../etc/passwd will open a file outside the public directory. Fix: use os.path.realpath and verify the resolved path starts with the public directory.\n2. [Wrong MIME type for JPEG] The MIME type for .jpg is image/jpeg, not image/jpg. Using the wrong type can cause browsers to mishandle the file and defeats X-Content-Type-Options: nosniff.\n\nBug findings:\n3. [Missing X-Content-Type-Options header] No nosniff header is set on any response. This is required as a security measure per the HW1 spec.\n4. [No 404 handling] If the file does not exist, open() raises a FileNotFoundError and the server crashes instead of returning a 404.\n5. [Missing MIME types] .gif, .ico, .mp4 and other extensions present in the public directory are not in the mime_types dict and will be served as text/plain, which breaks rendering.\n6. [Incorrect ext split on slashes] If the path has no extension (e.g. /public/somedir), split('.')[-1] returns the last segment without a dot, and the fallback text/plain is silently used with no error."
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "variantId": "D",
+        "title": "CSE 312 Mock Midterm — Variant D",
+        "description": "Focuses on multipart parsing, avatar uploads, video endpoints, and binary data handling from HW3.",
+        "totalPoints": 40,
+        "sections": [
+            {
+                "id": "mcq",
+                "title": "Section 1: Multiple Choice",
+                "type": "mcq",
+                "pointsPerQuestion": 1,
+                "questions": [
+                    {
+                        "q": "In HW3, why must the multipart body content be stored as bytes rather than a decoded string?",
+                        "options": [
+                            "MongoDB cannot store strings",
+                            "Binary files like images and videos cannot be decoded as UTF-8",
+                            "Python strings are immutable",
+                            "Strings take more memory than bytes",
+                            "The Content-Type header requires bytes"
+                        ],
+                        "answer": 1
+                    },
+                    {
+                        "q": "When parsing a multipart body, the boundary in the body is prefixed with:",
+                        "options": [
+                            "##",
+                            "--",
+                            "__",
+                            "==",
+                            "boundary="
+                        ],
+                        "answer": 1
+                    },
+                    {
+                        "q": "Which of the following is the correct MIME type for a .gif file?",
+                        "options": [
+                            "image/jpg",
+                            "image/png",
+                            "image/gif",
+                            "image/webp",
+                            "image/x-gif"
+                        ],
+                        "answer": 2
+                    },
+                    {
+                        "q": "When a user uploads a second avatar image, what should happen to the first one per the HW3 spec?",
+                        "options": [
+                            "Both images are kept and the user picks which to display",
+                            "The first image is deleted from disk",
+                            "The first is replaced — the new upload should overwrite or replace the old entry",
+                            "A 409 Conflict error is returned",
+                            "The server stores all versions for history"
+                        ],
+                        "answer": 2
+                    },
+                    {
+                        "q": "What does the `created_at` field in the GET /api/videos response contain?",
+                        "options": [
+                            "The video duration in seconds",
+                            "The file size in bytes",
+                            "A timestamp string indicating when the video was uploaded",
+                            "The MongoDB ObjectId",
+                            "The uploader's user ID"
+                        ],
+                        "answer": 2
+                    },
+                    {
+                        "q": "Why should uploaded files be saved to disk rather than stored directly in MongoDB?",
+                        "options": [
+                            "MongoDB does not support binary data",
+                            "Disk storage is faster for all use cases",
+                            "Large binary files are expensive to store and transfer in a database; disk is more appropriate",
+                            "Files stored in MongoDB cannot be deleted",
+                            "The HW spec requires disk because Docker does not support MongoDB blobs"
+                        ],
+                        "answer": 2
+                    },
+                    {
+                        "q": "Which Python library is recommended in HW3 for generating video thumbnails from specific timestamps?",
+                        "options": [
+                            "PIL",
+                            "OpenCV",
+                            "ffmpeg (via system call or bindings)",
+                            "moviepy",
+                            "imageio"
+                        ],
+                        "answer": 2
+                    },
+                    {
+                        "q": "What HTTP method is used to change a video's thumbnail in HW3 AO1?",
+                        "options": [
+                            "POST",
+                            "PATCH",
+                            "PUT",
+                            "DELETE",
+                            "GET"
+                        ],
+                        "answer": 2
+                    }
+                ]
+            },
+            {
+                "id": "short_answer",
+                "title": "Section 2: Short Answer",
+                "type": "rubric",
+                "pointsPerQuestion": 3,
+                "questions": [
+                    {
+                        "q": "Explain what buffering is in the context of receiving HTTP requests, and why a simple `recv(4096)` is not sufficient for large uploads.",
+                        "rubric": "3 Points Total:\n[1 pt] TCP delivers data as a stream; a single recv() may not return the entire request body.\n[1 pt] For large uploads (images, videos), the body can be megabytes or gigabytes — a single small buffer will miss data.\n[1 pt] Correct approach: read Content-Length from the headers, then loop calling recv() and accumulating bytes until the full body is received."
+                    },
+                    {
+                        "q": "Explain the structure of a multipart/form-data request body at the byte level.",
+                        "rubric": "3 Points Total:\n[1 pt] The body starts with --<boundary> on its own line, followed by headers for the first part (e.g. Content-Disposition, Content-Type), then a blank line, then the part content.\n[1 pt] Each additional part is introduced by another --<boundary> line.\n[1 pt] The body ends with --<boundary>-- (note the trailing --)."
+                    },
+                    {
+                        "q": "What is Adaptive Bit-Rate (ABR) streaming, and how does HLS implement it?",
+                        "rubric": "3 Points Total:\n[1 pt] ABR lets the player switch between different quality levels of a video based on available bandwidth.\n[1 pt] HLS uses .m3u8 playlist files: a master playlist references multiple stream playlists at different resolutions/bitrates.\n[1 pt] Each stream playlist lists .ts (transport stream) segment files; the player downloads segments from the appropriate quality stream."
+                    },
+                    {
+                        "q": "Describe two ways a server can identify the type of an uploaded file and explain which is more reliable.",
+                        "rubric": "3 Points Total:\n[1 pt] Method 1: check the file extension from the filename submitted by the client.\n[1 pt] Method 2: read the first few bytes of the file and match against known file signatures (magic bytes), e.g. \\xFF\\xD8\\xFF for JPEG.\n[1 pt] Magic bytes are more reliable because an attacker can rename any file to .jpg; the magic bytes reveal the true format. (For this course checking the extension is acceptable, but not more reliable.)"
+                    }
+                ]
+            },
+            {
+                "id": "req_res",
+                "title": "Section 3: Request / Response Structure",
+                "type": "rubric",
+                "pointsPerQuestion": 2,
+                "questions": [
+                    {
+                        "q": "Write the HTTP/1.1 response your server returns after a user successfully uploads a video. The response must include the generated video ID.",
+                        "rubric": "2 Points Total:\n[1 pt] Status line: HTTP/1.1 200 OK, with Content-Type: application/json.\n[1 pt] Body is a JSON object with an id field: {\"id\": \"<generated-uuid>\"}, and Content-Length reflects the byte length of the JSON body."
+                    },
+                    {
+                        "q": "Sketch the structure of a multipart request body (just the text portions — you don't need real binary data) for an avatar upload where the form field is named `avatar` and the file is `photo.png`.",
+                        "rubric": "2 Points Total:\n[1 pt] Shows the boundary line --<boundary>, then Content-Disposition: form-data; name=\"avatar\"; filename=\"photo.png\" header.\n[1 pt] Followed by a blank line (\\r\\n), then the imagined binary content, then ending with --<boundary>--."
+                    }
+                ]
+            },
+            {
+                "id": "explain",
+                "title": "Section 4: Explain Concept",
+                "type": "rubric",
+                "pointsPerQuestion": 4,
+                "questions": [
+                    {
+                        "q": "Explain the full lifecycle of a video upload in HW3: from the multipart request arriving at the server to the video being playable at GET /api/videos/{id}.",
+                        "rubric": "4 Points Total:\n[1 pt] Server receives a multipart POST /api/videos request; parse_multipart() extracts the title, description, and video bytes.\n[1 pt] The video bytes are written to a file on disk (e.g. in public/videos/) with a generated unique name.\n[1 pt] A MongoDB document is inserted with title, description, file path, author_id, created_at, and generated id.\n[1 pt] GET /api/videos/{id} queries MongoDB by id, finds the document, and returns the metadata as JSON; the video_path tells the client where to fetch the actual file."
+                    },
+                    {
+                        "q": "Explain what TOTP (Time-based One-Time Password) is and how a server verifies a TOTP code without storing the code in the database.",
+                        "rubric": "4 Points Total:\n[1 pt] TOTP is an algorithm that generates a short-lived numeric code based on a shared secret and the current time.\n[1 pt] The server stores only the user's TOTP secret (not the code). The client app (e.g. Google Authenticator) uses the same secret + current time to generate the same code.\n[1 pt] When the user submits a code, the server runs the TOTP algorithm with the stored secret and current time and checks if its output matches the submitted code.\n[1 pt] Codes are typically valid for 30 seconds and expire automatically, making replay attacks impractical."
+                    }
+                ]
+            },
+            {
+                "id": "code_review",
+                "title": "Section 5: Read Code (Bugs + Vulnerabilities)",
+                "type": "rubric",
+                "pointsPerQuestion": 8,
+                "questions": [
+                    {
+                        "q": "Read this avatar upload handler carefully. There are multiple bugs and security vulnerabilities. Find at least 3 issues for full credit.\n\n```python\n# POST /api/users/avatar\ndef handle_avatar_upload(request, handler):\n    result = parse_multipart(request)\n    avatar_part = result.parts[0]\n\n    filename = avatar_part.headers[\"Content-Disposition\"].split(\"filename=\\\"\")[1].rstrip('\"')\n    save_path = \"public/imgs/profile-pics/\" + filename\n\n    with open(save_path, \"wb\") as f:\n        f.write(avatar_part.content)\n\n    db.users.update_one(\n        {\"session\": request.cookies.get(\"session\")},\n        {\"$set\": {\"imageURL\": \"/\" + save_path}}\n    )\n\n    response = Response()\n    response.set_status(200, \"OK\")\n    response.text(\"Avatar updated\")\n    handler.send_all(response.to_data())\n```",
+                        "rubric": "8 Points Total. Award up to 8 points for clearly identifying at least 3 of the following issues:\n\nSecurity findings:\n1. [Path Traversal via filename] The client-supplied filename is used directly to build the save path. An attacker can upload a file named ../../server.py and overwrite server source files.\n2. [No auth check] The code looks up the user by session cookie without verifying the session is valid or that the user is logged in via auth_token. Any request with any session value can update a user record.\n3. [No file type validation] The code saves any uploaded content with the client-supplied extension. An attacker could upload a .py or .html file that gets served as a script or page.\n\nBug findings:\n4. [Auth lookup uses wrong field] HW2 identifies users by auth_token (hashed), not by a session cookie. Querying by 'session' will fail to find the user after HW2 authentication is implemented.\n5. [Filename fragile parsing] If the Content-Disposition header does not contain filename=\" (e.g. the filename contains special chars or is missing), the split will raise an IndexError.\n6. [No response Content-Length check] The response is sent without verifying to_data() produces a valid response; if the Response class requires at least bytes() or text() to be called first, this might produce an empty body."
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "variantId": "E",
+        "title": "CSE 312 Mock Midterm — Variant E",
+        "description": "Mixed review of HTTP, WebSockets, emoji reactions, 2FA, and OAuth 2.0 from HW1–HW2 AOs.",
+        "totalPoints": 40,
+        "sections": [
+            {
+                "id": "mcq",
+                "title": "Section 1: Multiple Choice",
+                "type": "mcq",
+                "pointsPerQuestion": 1,
+                "questions": [
+                    {
+                        "q": "When a client sends a WebSocket frame, the payload is:",
+                        "options": [
+                            "Always unmasked",
+                            "Always masked using a 4-byte masking key with XOR",
+                            "Compressed with gzip",
+                            "Encrypted with AES",
+                            "Encoded as base64"
+                        ],
+                        "answer": 1
+                    },
+                    {
+                        "q": "The WebSocket frame header contains which of the following? (Select the most complete correct answer)",
+                        "options": [
+                            "FIN bit, opcode, MASK bit, payload length",
+                            "Only the payload length and CRC checksum",
+                            "HTTP method and path",
+                            "Sequence number and acknowledgment number",
+                            "Only the opcode and payload"
+                        ],
+                        "answer": 0
+                    },
+                    {
+                        "q": "Which of the following correctly describes the Authorization Code Flow in OAuth 2.0?",
+                        "options": [
+                            "The client receives the access token directly from the authorization server without a redirect",
+                            "The user's password is sent to the client app, which exchanges it for a token",
+                            "The browser is redirected to the auth server, user approves, a code is sent to the redirect URI, and the server exchanges the code for a token",
+                            "The client generates a token locally using the client secret",
+                            "The token is embedded in the URL fragment and never reaches the server"
+                        ],
+                        "answer": 2
+                    },
+                    {
+                        "q": "In TOTP-based 2FA, what two inputs are combined to generate a one-time code?",
+                        "options": [
+                            "The user's password and a random salt",
+                            "A shared secret and the current timestamp (rounded to 30-second intervals)",
+                            "The username and the server's private key",
+                            "A random nonce and the user's email",
+                            "The HMAC of the session token and the client IP"
+                        ],
+                        "answer": 1
+                    },
+                    {
+                        "q": "The `Sec-WebSocket-Accept` header in the 101 response is derived from:",
+                        "options": [
+                            "The client's IP address and port",
+                            "A SHA-1 hash of the Sec-WebSocket-Key concatenated with a GUID, then base64-encoded",
+                            "An HMAC of the path and method",
+                            "The server's TLS certificate fingerprint",
+                            "A random token generated by the server"
+                        ],
+                        "answer": 1
+                    },
+                    {
+                        "q": "In HW1, when should a new session cookie be issued to a chat user?",
+                        "options": [
+                            "When they first load the homepage",
+                            "When they first send a chat message",
+                            "When they make any request",
+                            "When they visit /chat",
+                            "Only when they explicitly request one via /api/session"
+                        ],
+                        "answer": 1
+                    },
+                    {
+                        "q": "For emoji reactions in HW2 AO1, what should the server return if a user tries to react to the same message with the same emoji twice?",
+                        "options": [
+                            "200 OK, ignore the duplicate",
+                            "400 Bad Request",
+                            "403 Forbidden",
+                            "409 Conflict",
+                            "204 No Content"
+                        ],
+                        "answer": 2
+                    },
+                    {
+                        "q": "Which OAuth 2.0 concern makes it important to validate the `state` parameter in the callback?",
+                        "options": [
+                            "It ensures the access token is not expired",
+                            "It prevents CSRF attacks on the OAuth flow",
+                            "It verifies the user's email address",
+                            "It confirms the scopes granted match what was requested",
+                            "It ensures the redirect URI is HTTPS"
+                        ],
+                        "answer": 1
+                    }
+                ]
+            },
+            {
+                "id": "short_answer",
+                "title": "Section 2: Short Answer",
+                "type": "rubric",
+                "pointsPerQuestion": 3,
+                "questions": [
+                    {
+                        "q": "Explain the three-step process for XOR-unmasking a WebSocket payload in Python.",
+                        "rubric": "3 Points Total:\n[1 pt] Extract the 4-byte masking key from bytes 2–5 (or wherever the key appears based on payload length).\n[1 pt] For each byte i in the payload, compute unmasked[i] = payload[i] XOR masking_key[i % 4].\n[1 pt] The result is the decoded payload bytes, which can then be decoded as UTF-8 for text frames."
+                    },
+                    {
+                        "q": "Explain the security risk of storing a GitHub OAuth client secret in your source code and how the HW2 spec requires you to handle it.",
+                        "rubric": "3 Points Total:\n[1 pt] If the client secret is committed to a public repository, attackers can use it to impersonate your app and obtain OAuth tokens for any user who connects.\n[1 pt] The HW2 spec requires storing secrets in a .env file (not committed to the repo) with placeholder values in submissions.\n[1 pt] At runtime, python-dotenv (or os.environ) loads the values, keeping secrets out of source code and version control."
+                    },
+                    {
+                        "q": "Explain what percent-encoding is and give an example of how a form password like `p@ss#1` would be encoded in an x-www-form-urlencoded body.",
+                        "rubric": "3 Points Total:\n[1 pt] Percent-encoding replaces special characters with % followed by two hex digits representing the ASCII code.\n[1 pt] The @ character is %40 and # is %23.\n[1 pt] So p@ss#1 becomes p%40ss%231 in the encoded body."
+                    },
+                    {
+                        "q": "Why is it important that the `state` parameter in OAuth 2.0 be a randomly generated, unguessable value?",
+                        "rubric": "3 Points Total:\n[1 pt] State is sent to the authorization server and echoed back in the redirect to your callback URL.\n[1 pt] If state is predictable, an attacker can craft a malicious link that completes the OAuth flow on behalf of a victim, linking the attacker's GitHub account to the victim's session (CSRF on OAuth).\n[1 pt] A random, session-bound state ties the callback to the specific user who initiated the flow, preventing this attack."
+                    }
+                ]
+            },
+            {
+                "id": "req_res",
+                "title": "Section 3: Request / Response Structure",
+                "type": "rubric",
+                "pointsPerQuestion": 2,
+                "questions": [
+                    {
+                        "q": "Write the full HTTP/1.1 101 Switching Protocols response your server sends to upgrade a connection to WebSocket. Include all required headers.",
+                        "rubric": "2 Points Total:\n[1 pt] Status line: HTTP/1.1 101 Switching Protocols.\n[1 pt] Headers: Upgrade: websocket, Connection: Upgrade, Sec-WebSocket-Accept: <base64-sha1-hash>, followed by \\r\\n\\r\\n with no body."
+                    },
+                    {
+                        "q": "Write the HTTP/1.1 request your server sends to GitHub's token endpoint to exchange an authorization code for an access token. List the method, URL, and required body parameters.",
+                        "rubric": "2 Points Total:\n[1 pt] POST https://github.com/login/oauth/access_token with Accept: application/json and Content-Type: application/x-www-form-urlencoded.\n[1 pt] Body must contain client_id, client_secret, code (the authorization code), and redirect_uri."
+                    }
+                ]
+            },
+            {
+                "id": "explain",
+                "title": "Section 4: Explain Concept",
+                "type": "rubric",
+                "pointsPerQuestion": 4,
+                "questions": [
+                    {
+                        "q": "Explain the full OAuth 2.0 Authorization Code Flow for the 'Login with GitHub' feature in HW2, starting from the user clicking the button to the user being logged in.",
+                        "rubric": "4 Points Total:\n[1 pt] GET /authgithub: server redirects browser to GitHub's authorization URL with client_id, redirect_uri, scope, and a random state.\n[1 pt] User approves on GitHub; GitHub redirects to /authcallback with code and state. Server validates state matches the one it sent.\n[1 pt] Server makes a server-side POST to GitHub's token endpoint with client_id, client_secret, and code to obtain an access token.\n[1 pt] Server uses the access token to call GitHub's user API, retrieves the username, creates or looks up the user in MongoDB, issues an auth_token cookie, and redirects to the homepage."
+                    },
+                    {
+                        "q": "Explain how WebSocket enables real-time bidirectional communication compared to standard HTTP polling.",
+                        "rubric": "4 Points Total:\n[1 pt] HTTP polling requires the client to repeatedly send requests to check for new data, introducing latency and wasting bandwidth.\n[1 pt] WebSocket reuses the same TCP connection after the upgrade handshake; either side can push data at any time.\n[1 pt] The server can push a new chat message to all connected clients immediately without them asking.\n[1 pt] Frames are small (compared to full HTTP headers on each poll request), making WebSocket more efficient for high-frequency updates like chat or live reactions."
+                    }
+                ]
+            },
+            {
+                "id": "code_review",
+                "title": "Section 5: Read Code (Bugs + Vulnerabilities)",
+                "type": "rubric",
+                "pointsPerQuestion": 8,
+                "questions": [
+                    {
+                        "q": "Read this emoji-reaction handler carefully. There are multiple bugs and security vulnerabilities. Find at least 3 issues for full credit.\n\n```python\n# PATCH /api/reaction/<message_id>\ndef handle_add_reaction(request, handler):\n    message_id = request.path.split(\"/\")[-1]\n    data = json.loads(request.body)\n    emoji = data[\"emoji\"]\n\n    auth = request.cookies.get(\"auth_token\")\n    user = db.users.find_one({\"auth_token\": auth})\n\n    if not user:\n        response = Response()\n        response.set_status(403, \"Forbidden\")\n        handler.send_all(response.to_data())\n        return\n\n    msg = db.chats.find_one({\"id\": message_id})\n    reactions = msg.get(\"reactions\", {})\n\n    if emoji in reactions and user[\"id\"] in reactions[emoji]:\n        reactions[emoji].append(user[\"id\"])\n    else:\n        reactions[emoji] = [user[\"id\"]]\n\n    db.chats.update_one({\"id\": message_id}, {\"$set\": {\"reactions\": reactions}})\n\n    response = Response()\n    response.set_status(200, \"OK\")\n    response.text(\"Reaction added\")\n    handler.send_all(response.to_data())\n```",
+                        "rubric": "8 Points Total. Award up to 8 points for clearly identifying at least 3 of the following issues:\n\nSecurity findings:\n1. [Plaintext auth_token lookup] The code queries MongoDB with the raw auth_token cookie value. Per HW2, the DB should store a hash of the token. An attacker who reads the DB cannot reverse the hash — but this code stores and compares plaintext, negating that protection.\n2. [Logic inversion on duplicate reaction] The condition `if emoji in reactions and user[\"id\"] in reactions[emoji]` should trigger a 403 (duplicate reaction). Instead it calls append(), adding the user ID a second time. The else branch sets a new list, overwriting existing reactors. The duplicate check logic is completely backwards.\n\nBug findings:\n3. [No 403 for duplicate] When the user has already reacted with the same emoji, the spec requires a 403. The code instead silently appends the duplicate and returns 200.\n4. [No check if message exists] db.chats.find_one() can return None if the message_id doesn't match. Calling msg.get() on None raises an AttributeError and crashes the server.\n5. [Emoji not validated] The emoji field is used directly as a MongoDB key. A malicious user sending an emoji value containing special characters (e.g. a MongoDB operator like $where) could alter query behavior.\n6. [reactions dict overwrites on else branch] When reactions[emoji] doesn't exist yet, the else branch correctly creates a new list. But when the emoji exists and the user is NOT yet in the list, the condition's if branch appends (correct behavior) — however, the condition block also handles the duplicate case incorrectly as described above, so real first-addition and duplicate-addition are confused."
+                    }
+                ]
+            }
+        ]
+    }
+]

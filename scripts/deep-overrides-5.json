@@ -1,0 +1,95 @@
+{
+  "1_0_TCPIP": {
+    "title": "TCP/IP & The Internet",
+    "description": "How computers actually talk to each other before HTTP.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### The Post Office of the Internet\nBefore you can send HTTP requests, computers physically need to know where to send the data. \n**IP (Internet Protocol)** acts as the global post office. Every connected device receives an **IP Address** (like `192.168.1.5`). Data is broken down into tiny envelopes called **Packets** and routed across the globe."
+      },
+      {
+        "type": "concept",
+        "title": "TCP vs UDP",
+        "content": "Once the packet reaches the correct IP address, how does the computer handle it?\n- **UDP (User Datagram Protocol)**: Shouts the message and doesn't care if you heard it. Super fast, but packets drop. Used for VoIP or live video games.\n- **TCP (Transmission Control Protocol)**: A highly reliable, three-way handshake connection (`SYN`, `SYN-ACK`, `ACK`). If a packet drops, TCP automatically re-requests it. HTTP strictly relies on TCP to guarantee the HTML arrives perfectly intact."
+      },
+      {
+        "type": "concept",
+        "title": "Ports: The Apartment Numbers",
+        "content": "An IP Address gets you to the correct building. A **Port** gets you to the correct apartment inside that building.\n- Your laptop might be running a Minecraft Server (Port 25565) and a Node.js Web Server (Port 8080) simultaneously.\n- Standard HTTP traffic defaults to Port **80**.\n- Standard HTTPS (Secure) traffic defaults to Port **443**."
+      },
+      {
+        "type": "quiz",
+        "question": "If you play an online multiplayer shooter, the game likely uses _____ because speed is prioritized over ensuring every single packet arrives in perfect order.",
+        "options": ["TCP", "HTTP", "UDP", "WebSocket"],
+        "answer": 2,
+        "explanation": "UDP is used for real-time applications where a lost packet (like a single frame of player movement) is better skipped rather than pausing the whole game to wait for it to be re-transmitted."
+      }
+    ]
+  },
+  "2_5_Authentication_Tokens": {
+    "title": "Stateless Auth (JWTs & Tokens)",
+    "description": "Serverless memory using Cryptographic Signatures.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### Scaling the Bouncer\nImagine a club with a million guests. If the bouncer has to check the master guest list (Database) every single time a guest walks to the bar, the line stops moving.\n\nInstead, the Bouncer checks the guest list once at the door, and hands the guest a **tamper-proof wristband** (Token). Now, any bartender can verify the wristband without ever checking the main database. This is **Stateless Authentication**."
+      },
+      {
+        "type": "concept",
+        "title": "Tokens vs Sessions",
+        "content": "In traditional authentication, the server generates a random string (Session ID), saves it in the Database, and gives it to the Client. \nIn **Token Authentication**, the server generates a JSON object (e.g., `{ \"user\": 5, \"role\": \"admin\" }`), **cryptographically signs it** using a massive secret key, and hands the token to the client.\n\nBecause of the signature, the client CAN read the data, but CANNOT modify it. If they change `\"role\": \"user\"` to `\"role\": \"admin\"`, the cryptographic signature breaks, and the server instantly rejects it."
+      },
+      {
+        "type": "quiz",
+        "question": "If you send a client a signed JWT (JSON Web Token) that contains their email and user ID, can the client natively read that information using JavaScript?",
+        "options": [
+          "Yes. JWTs are usually just Base64 encoded, not encrypted.",
+          "No, because the Token is encrypted with the server's private key.",
+          "Yes, but only if they have the HttpOnly directive.",
+          "No, the browser automatically prevents reading tokens."
+        ],
+        "answer": 0,
+        "explanation": "Signatures provide Integrity, NOT Confidentiality. The data in a standard Token is encoded in Base64 (which is instantly readable by anyone). You should never put secret data (like a plaintext password or SSN) inside a JWT."
+      }
+    ]
+  },
+  "2_9_OAuth": {
+    "title": "OAuth 2.0 Roles",
+    "description": "Understanding the actors in federated login.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "The Four Actors of OAuth",
+        "content": "To deeply understand OAuth, you must memorize the four specific roles:\n1. **Resource Owner**: That's YOU (the human user). You own data on GitHub.\n2. **Client**: The app trying to access your data (e.g., your CSE312 Midterm Prep App).\n3. **Authorization Server**: The system verifying your identity (GitHub's login page).\n4. **Resource Server**: The system actually holding the data (GitHub's API that returns your email address)."
+      },
+      {
+        "type": "concept",
+        "title": "Scope",
+        "content": "When the Client redirects the Resource Owner to the Authorization Server, it specifies a **Scope** in the URL.\nThe Scope dictates exactly what permissions the Client is asking for (e.g., `scope=user:email,read:org`). \nThe Authorization Server explicitly asks the Resource Owner: 'Are you absolutely sure you want to grant this specific Client these specific Scopes?'"
+      }
+    ]
+  },
+  "2_11_OAuth": {
+    "title": "OAuth Under the Hood",
+    "description": "Client IDs and Security Implications.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "Client ID vs Client Secret",
+        "content": "Every OAuth Client is assigned two keys by the Authorization Server when registering:\n- **Client ID**: A public identifier. This is safe to put in URLs and HTML. It simply tells GitHub which app is asking for login.\n- **Client Secret**: A deeply private password. This MUST NEVER leave your backend server. It is used exclusively in server-to-server POST requests to exchange an Authorization Code for an Access Token."
+      },
+      {
+        "type": "quiz",
+        "question": "If an attacker discovers your OAuth Client ID (by reading the URL when clicking Login), can they steal your users' accounts?",
+        "options": [
+          "Yes, they can forge login requests.",
+          "Yes, the Client ID grants full administrative access.",
+          "No, the Client ID is public by design.",
+          "No, because they still need the user's password."
+        ],
+        "answer": 2,
+        "explanation": "The Client ID is strictly public information (it is naturally exposed in the redirect URL). The true security relies on the Client Secret, which stays hidden on the backend."
+      }
+    ]
+  }
+}

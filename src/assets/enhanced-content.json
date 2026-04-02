@@ -1,0 +1,651 @@
+[
+  {
+    "id": "1_0_TCPIP",
+    "title": "TCP/IP & The Internet",
+    "description": "How computers actually talk to each other before HTTP.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### The Post Office of the Internet\nBefore you can send HTTP requests, computers physically need to know where to send the data. \n**IP (Internet Protocol)** acts as the global post office. Every connected device receives an **IP Address** (like `192.168.1.5`). Data is broken down into tiny envelopes called **Packets** and routed across the globe."
+      },
+      {
+        "type": "concept",
+        "title": "TCP vs UDP",
+        "content": "Once the packet reaches the correct IP address, how does the computer handle it?\n- **UDP (User Datagram Protocol)**: Shouts the message and doesn't care if you heard it. Super fast, but packets drop. Used for VoIP or live video games.\n- **TCP (Transmission Control Protocol)**: A highly reliable, three-way handshake connection (`SYN`, `SYN-ACK`, `ACK`). If a packet drops, TCP automatically re-requests it. HTTP strictly relies on TCP to guarantee the HTML arrives perfectly intact."
+      },
+      {
+        "type": "concept",
+        "title": "Ports: The Apartment Numbers",
+        "content": "An IP Address gets you to the correct building. A **Port** gets you to the correct apartment inside that building.\n- Your laptop might be running a Minecraft Server (Port 25565) and a Node.js Web Server (Port 8080) simultaneously.\n- Standard HTTP traffic defaults to Port **80**.\n- Standard HTTPS (Secure) traffic defaults to Port **443**."
+      },
+      {
+        "type": "quiz",
+        "question": "If you play an online multiplayer shooter, the game likely uses _____ because speed is prioritized over ensuring every single packet arrives in perfect order.",
+        "options": [
+          "TCP",
+          "HTTP",
+          "UDP",
+          "WebSocket"
+        ],
+        "answer": 2,
+        "explanation": "UDP is used for real-time applications where a lost packet (like a single frame of player movement) is better skipped rather than pausing the whole game to wait for it to be re-transmitted."
+      }
+    ]
+  },
+  {
+    "id": "1_1_HTTP",
+    "title": "HTTP 1.1: Comprehensive Overview",
+    "description": "Deep dive into the HyperText Transfer Protocol, requests, responses, and URLs.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### What is HTTP?\n**HTTP (HyperText Transfer Protocol)** is an Application Layer protocol that handles communication between your browser (Front End) and a Web Server (Back End). It is the foundation of data communication on the World Wide Web.\n\nWhile HTTP defines the *format* of the messages, it relies on lower-level protocols like **TCP** to handle the actual reliable transmission of data across the network.\n\nHTTP is defined extensively in **RFC2616** by the **IETF** (Internet Engineering Task Force). Whenever you have a question about how HTTP is supposed to work, RFC2616 is the absolute source of truth."
+      },
+      {
+        "type": "concept",
+        "title": "Anatomy of a URL",
+        "content": "Every HTTP request targets a specific **URL (Uniform Resource Locator)**. A URL consists of several distinct components:\n\n`Protocol://host:port/path?query_string#fragment`\n\n- **Protocol:** The scheme being used (e.g., `http`, `https`, `ftp`).\n- **Host:** The IP address or domain name (routes the request to the right machine).\n- **Port:** The TCP port number (`80` for HTTP, `443` for HTTPS by default).\n- **Path:** Specifies the exact resource on the server (`/images/cat.png`).\n- **Query String (Optional):** Key-value pairs passing extra data (`?q=web+development&ia=images`).\n- **Fragment (Optional):** Used purely by the browser to scroll to a specific section of the page (`#Definition`)."
+      },
+      {
+        "type": "concept",
+        "title": "The Server Response & Status Codes",
+        "content": "The server replies with a **Status Line** (e.g., `HTTP/1.1 200 OK`). Following the headers, there is a mandatory **Blank Line (`\\r\\n\\r\\n`)** that separates the headers from the Response Body. This blank line is crucial; without it, the browser doesn't know where the metadata ends and the actual content begins.\n\n**Common Status Code Families:**\n- **200s (Success):** The request was received, understood, and accepted.\n- **300s (Redirection):** Further action needs to be taken by the user agent. (Includes the `Location` header).\n- **400s (Client Error):** The client messed up. (e.g., `404 Not Found` if the path doesn't exist).\n- **500s (Server Error):** The server completely failed to fulfill an apparently valid request."
+      },
+      {
+        "type": "quiz",
+        "question": "If you are parsing an HTTP request and you encounter a blank line exactly consisting of `\\r\\n\\r\\n`, what does this signify?",
+        "options": [
+          "The connection has been dropped.",
+          "The end of the HTTP Headers and the immediate start of the Body.",
+          "An invalid request format.",
+          "The end of the entire message."
+        ],
+        "answer": 1,
+        "explanation": "The blank line `\\r\\n\\r\\n` is the standard HTTP delimiter that marks the definitive end of the headers. Any bytes that follow it belong to the body payload."
+      }
+    ]
+  },
+  {
+    "id": "1_2_Encodings",
+    "title": "Encodings & MIME Types: Bytes over the Wire",
+    "description": "Understanding how strictly typed bytes translate into text, imagery, and video.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "ASCII vs. UTF-8",
+        "content": "The original standard was **ASCII**, a 7-bit encoding that mapped English letters and symbols to exactly 128 numbers (e.g., 'A' is 65). Because it's 7-bit, an ASCII character always takes up exactly 1 Byte.\n\nThis broke down constantly when the web globalized. We needed a universal alphabet. Enter **UTF-8**, the modern standard encoding for web text.\n\n- **UTF-8** uses variable lengths: 1 to 4 bytes per character.\n- Characters like 'A' are 1 byte (meaning all ASCII strings are completely valid UTF-8).\n- Emojis, Cyrillic, or Kanji use 2 to 4 bytes.\n- When transmitting text over HTTP, you must convert it to a Byte Array using `.encode()` (which defaults to UTF-8 in Python) before sending."
+      },
+      {
+        "type": "concept",
+        "title": "The Danger of Content-Length",
+        "content": "When an HTTP request or response contains a Body, it **MUST** include a `Content-Length` header. This tells the receiver exactly how many bytes to read.\n\n**A Massive Trap for Developers:**\nIf you set `Content-Length` equal to the length of the string (e.g., `len(\"文字列\")`), you will introduce severe bugs. \nThe length of that string is 3 characters. But in UTF-8, characters take up to 4 bytes each. The actual size over the wire is 9 octets (bytes). \n\n**Rule:** Always convert your text to bytes FIRST (`content.encode()`), and *then* take the length of the byte array to set your `Content-Length`."
+      },
+      {
+        "type": "quiz",
+        "question": "What is the only valid encoding format allowed for HTTP Headers and the Request Line?",
+        "options": [
+          "UTF-8",
+          "UTF-16",
+          "ASCII",
+          "Base64"
+        ],
+        "answer": 2,
+        "explanation": "HTTP protocol definitions require that all HTTP headers and control lines be strictly encoded in ASCII. Only the body of the message can utilize complex encodings like UTF-8."
+      },
+      {
+        "type": "concept",
+        "title": "MIME Sniffing & Security Risks",
+        "content": "Modern browsers try to be completely foolproof. If your server sends an image but misses the `Content-Type` header, the browser will \"sniff\" the bytes, realize it's an image, and render it anyway. \n\n**The Security Hack:**\nImagine you run a site where users upload profile pictures. A malicious user uploads a script instead of an image. If your server blindly serves it, the browser might sniff the file, realize it's JavaScript, and execute it on another user's machine (Cross-Site Scripting).\n\n**The Fix:**\nAlways forcefully disable sniffing by including this header on your HTTP responses: \n`X-Content-Type-Options: nosniff`"
+      }
+    ]
+  },
+  {
+    "id": "1_3_POST",
+    "title": "POST Requests & Data Structuring",
+    "description": "How to properly submit heavy data through HTTP.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "When to use POST vs GET",
+        "content": "GET requests encode all their parameters in the URL (the Query String). This has a hard length limit set by browsers/servers, and the parameters are highly visible and stored in browser history.\n\n**POST** requests send their data inside the HTTP **Body**. This allows the sending of massive amounts of data (like video uploads) and keeps sensitive actions out of the URL bar."
+      },
+      {
+        "type": "concept",
+        "title": "Formatting the Body",
+        "content": "When a browser submits an HTML `<form>`, it defaults to encoding the inputs as `application/x-www-form-urlencoded`. \nThis format looks exactly like a URL query string: `username=admin&password=1234&color=blue`.\n\nWhen sending JSON from JavaScript `fetch()`, the body is formatted as `application/json`, which requires entirely different parsing logic on the backend."
+      },
+      {
+        "type": "quiz",
+        "question": "Why is it unsafe to use a GET request for a 'Delete Account' action?",
+        "options": [
+          "GET requests are not encrypted.",
+          "Browsers can pre-fetch URLs or users can share the URL, accidentally triggering the deletion.",
+          "GET requests cannot reach databases.",
+          "A GET request can only return HTML."
+        ],
+        "answer": 1,
+        "explanation": "GET requests must be 'safe' and 'idempotent' (should not alter server state). If deletion was a GET request, a user clicking a simple link or the browser pre-loading a page could permanently delete the account."
+      }
+    ]
+  },
+  {
+    "id": "1_4_Databases",
+    "title": "Databases: State Persistence (Deep Dive)",
+    "description": "SQL vs NoSQL, Collections, and defeating SQL Injection.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### Where data lives forever\nWhen your Node.js server crashes or restarts, everything stored in its RAM (variables, arrays) vanishes. To build a persistent app, you need a safe vault that survives restarts. This is the **Database**.\n\nDatabases operate as entirely separate software processes. Your web server communicates with the Database via a network socket. There are two major families: **SQL (Relational)** and **NoSQL (Document-based)**."
+      },
+      {
+        "type": "concept",
+        "title": "SQL Injection: The Most Famous Hack",
+        "content": "In SQL databases, you write queries like: `SELECT * FROM users WHERE username = '` + user_input + `'`.\n\n**The Hack:** If an attacker types `' OR 1=1; --` into the username box, the query becomes:\n`SELECT * FROM users WHERE username = '' OR 1=1; --'`\nThis evaluates to TRUE for every single user, logging them in as the first user (usually the admin) without a password!\n\n**The Fix:** NEVER concatenate strings into SQL queries. Always use **Prepared Statements**. Prepared statements send the query structure and the user input separately, ensuring the database treats the input strictly as data, never as executable code."
+      },
+      {
+        "type": "quiz",
+        "question": "Which of the following completely eliminates the risk of SQL Injection?",
+        "options": [
+          "Using a Regex to filter out semicolons.",
+          "Hashing the user's password using bcrypt.",
+          "Using Prepared Statements.",
+          "Running the database on a separate Docker container."
+        ],
+        "answer": 2,
+        "explanation": "Prepared Statements (or Parameterized Queries) are the absolute standard for stopping SQL Injection. They force the database driver to compile the query beforehand, mapping user input strictly as inert string values."
+      },
+      {
+        "type": "concept",
+        "title": "NoSQL & MongoDB",
+        "content": "In this course, we often use **MongoDB**, a NoSQL database.\n- Instead of Tables and Rows, MongoDB uses **Collections** and **Documents**.\n- Documents are stored in **BSON** (Binary JSON).\n- MongoDB natively prevents traditional SQL Injection because queries are structurally defined as JSON objects (e.g., `{ username: \"admin\" }`), rather than parsed as a raw string of code."
+      }
+    ]
+  },
+  {
+    "id": "1_5_API",
+    "title": "RESTful APIs & CRUD",
+    "description": "How the Front End talks to the Database.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### The Waiter in the Restaurant\nOnce you have a Database (the Kitchen) and a Client (the Customer), you need someone to take the orders and deliver the food. This is the **API (Application Programming Interface)**.\n\nWithout an API, the client would have to directly run SQL commands on your database, which is a massive security risk. Instead, the API provides a strict, safe menu of operations the client is allowed to perform."
+      },
+      {
+        "type": "concept",
+        "title": "CRUD Operations",
+        "content": "Every major data interaction maps to four basic operations, known as **CRUD**:\n- **Create**: Insert new data (e.g., registering an account). Mapped to HTTP `POST`.\n- **Retrieve**: Read existing data (e.g., viewing a profile). Mapped to HTTP `GET`.\n- **Update**: Modify existing data (e.g., changing a password). Mapped to HTTP `PUT` or `PATCH`.\n- **Delete**: Remove data. Mapped to HTTP `DELETE`.\n\n*(Note: In the real world, we rarely structurally delete data; we perform 'Soft Deletes' by setting an `is_deleted = true` flag in the database to preserve history.)*"
+      },
+      {
+        "type": "concept",
+        "title": "Idempotency",
+        "content": "A crucial engineering concept in APIs is **Idempotency**.\nIf an operation is idempotent, it means running the exact same request 100 times has the exact same effect on the server as running it 1 time. $f(f(x)) = f(x)$.\n\n- **GET**: Idempotent. Asking for a profile 100 times doesn't change the profile.\n- **DELETE**: Idempotent. Deleting an account 100 times just means it's deleted.\n- **PUT**: Idempotent. Replacing a profile picture with Image A 100 times leaves Image A as the picture.\n- **POST**: NOT Idempotent. Submitting a 'Create Account' request 100 times will result in 100 different accounts being created."
+      },
+      {
+        "type": "quiz",
+        "question": "Which of these HTTP Requests is intrinsically NOT Idempotent?",
+        "options": [
+          "GET",
+          "DELETE",
+          "POST",
+          "PUT"
+        ],
+        "answer": 2,
+        "explanation": "POST is completely unpredictable from the protocol's perspective. The server processes the input to create a brand new state on every request, usually resulting in a new database row being generated each time."
+      },
+      {
+        "type": "concept",
+        "title": "RESTful Constraints",
+        "content": "A wildly popular methodology for designing APIs is **REST (REpresentational State Transfer)**. An API is \"RESTful\" if it strictly follows HTTP semantics (e.g., using `DELETE /user/5` instead of `POST /delete_user?id=5`).\n\nCore REST Constraints include:\n- **Client-Server Architecture**: The UI is totally separated from data storage.\n- **Statelessness**: Every request must contain all the info needed to process it. The server shouldn't remember preceding requests in an open session.\n- **Cacheability**: Responses should explicitly say if they can be cached to save bandwidth.\n- **Layered System**: The client doesn't know if it's hitting the real server, a load balancer, or a cache."
+      }
+    ]
+  },
+  {
+    "id": "1_6_Cookies",
+    "title": "Mastering Cookies (Deep Dive)",
+    "description": "Crucial Midterm Content: State, Directives, and Security.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### The Amnesia of HTTP\nHTTP is a **stateless** protocol. Imagine interacting with a cashier who instantly forgets who you are the moment you finish speaking. You ask for a burger, they give you a burger. You ask for fries, they ask 'Who are you paying for?'.\n\nTo build features like Authentication, where we remember a user across multiple visits, we need **State**. Since HTTP cannot do this natively, we use **Cookies**."
+      },
+      {
+        "type": "concept",
+        "title": "Set-Cookie vs Cookie Headers",
+        "content": "Cookies function purely through HTTP Headers (meaning they must be ASCII only).\n\n1. **Server tells Client to save a Cookie**:\nThe server includes the `Set-Cookie` header in its HTTP Response.\n`Set-Cookie: id=X6kAwpgW29M`\n\n*Crucial restriction*: Only 1 cookie is allowed per `Set-Cookie` header! To set 5 cookies, you must send 5 separate `Set-Cookie` headers.\n\n2. **Client sends Cookies to Server**:\nOn every subsequent request, the browser automatically sends back the data using the `Cookie` header.\n`Cookie: id=X6kAwpgW29M; visits=4`\n\n*Notice*: The browser sends ALL cookies separated by a semicolon `;` in a single `Cookie` header."
+      },
+      {
+        "type": "quiz",
+        "question": "If a server wants to set three different cookies on the user's browser, how must it format the HTTP Response?",
+        "options": [
+          "Include three separate `Set-Cookie` headers.",
+          "Include one `Set-Cookie` header with all three cookies separated by semicolons.",
+          "Include one `Cookie` header with all three cookies separated by semicolons.",
+          "It is impossible; HTTP only supports one cookie per session."
+        ],
+        "answer": 0,
+        "explanation": "To set multiple cookies, the server MUST send multiple `Set-Cookie` headers. By contrast, when the client replies, it squashes them all into a single `Cookie` header separated by semicolons."
+      },
+      {
+        "type": "concept",
+        "title": "Cookie Directives (Vital for Midterm)",
+        "content": "You can attach rules (directives) when setting a cookie by adding a semicolon after the value: `Set-Cookie: key=val; Directive`\n\n- **Expires**: The exact date/time it deletes.\n- **Max-Age**: Seconds until deletion.\n- **Session Cookies**: If NEITHER Expires nor Max-Age are set, the cookie deletes when the browser is completely closed.\n- **Secure**: Only sent over HTTPS, protecting from packet-sniffing on open WiFi.\n- **HttpOnly**: The cookie CANNOT be accessed by JavaScript (`document.cookie`). This entirely blocks XSS (Cross-Site Scripting) hijacking.\n- **SameSite**: Controls 3rd-party sending (`Lax`, `Strict`, `None`)."
+      },
+      {
+        "type": "quiz",
+        "question": "An attacker manages to inject malicious JavaScript into your webpage (an XSS attack). Which Cookie directive guarantees the attacker's script cannot steal the user's session token?",
+        "options": [
+          "Secure",
+          "SameSite=Strict",
+          "HttpOnly",
+          "Max-Age=0"
+        ],
+        "answer": 2,
+        "explanation": "HttpOnly strictly forbids JavaScript from reading the cookie, meaning even if an attacker executes code on the page, `document.cookie` will not reveal the session token."
+      }
+    ]
+  },
+  {
+    "id": "1_7_Docker",
+    "title": "Docker: Containerization (Deep Dive)",
+    "description": "Images, Containers, Port Mapping, and Volumes.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### \"It works on my machine...\"\nThe classic developer excuse when deploying code. Your code works on your Macbook, but crashes on the Linux production server because it has a different version of Python or Node installed.\n\n**Docker** solves this by shipping your code *and* the entire required operating system environment together in a standardized box called a **Container**. If a container runs on your laptop, Docker guarantees it will run exactly the same way in the cloud."
+      },
+      {
+        "type": "concept",
+        "title": "Images vs Containers",
+        "content": "**Images** are immutable blueprints. A `Dockerfile` is a script that tells Docker how to build an Image (e.g., `FROM node:18`, `COPY . /app`, `RUN npm install`).\n\n**Containers** are the actual running instances of an Image. You can launch 100 identical containers from a single Image. If a container crashes or is deleted, all data inside it is wiped."
+      },
+      {
+        "type": "concept",
+        "title": "Port Mapping & Volumes",
+        "content": "Containers are severely isolated for security. \n- **Port Mapping (`-p 8080:80`)**: If your Node app is listening on Port 80 inside the container, nobody outside can reach it. You must map a port on your Host machine (8080) to the container's port (80).\n- **Volumes**: Since containers are ephemeral (data is lost on restart), you use Volumes to map a folder on your Host hard drive directly into the container. This is how databases survive a container reboot."
+      },
+      {
+        "type": "quiz",
+        "question": "What is the primary difference between a Docker Image and a Docker Container?",
+        "options": [
+          "An Image is a running instance, a Container is the blueprint.",
+          "An Image is the read-only blueprint, the Container is the running, isolated instance.",
+          "Images are used for Front-End, Containers are used for Back-End.",
+          "They are two words for the exact same thing."
+        ],
+        "answer": 1,
+        "explanation": "The Image is the finalized, read-only template created by building a Dockerfile. A Container is an active, running process birthed from that template."
+      }
+    ]
+  },
+  {
+    "id": "2_4_Authentication",
+    "title": "Authentication & Security (Deep Dive)",
+    "description": "Passwords, Hashing, Entropy, and Rainbow Tables.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "The Golden Rule of Passwords",
+        "content": "### NEVER STORE PASSWORDS AS PLAIN TEXT.\nEven site admins shouldn't know user passwords. If your database is compromised via SQL Injection, plain text passwords mean a total breach (and users reuse passwords everywhere!).\n\nInstead, we store a **Cryptographic Hash** (like SHA256). A hash is a one-way mathematical function. It is incredibly easy and fast to compute the hash, but practically impossible to reverse the hash back into plain text. You verify users by hashing their input and comparing it to the stored hash."
+      },
+      {
+        "type": "concept",
+        "title": "Attacking Hashes: Dictionary & Brute Force",
+        "content": "If we only store Hashes, how do attackers win?\n\n- **Brute Force**: Hash absolutely *every* possible combination of characters until the hashes match. The difficulty of this is measured by **Entropy** (bits of uncertainty). You need >=80 bits for security.\n- **Dictionary Attack**: Attackers know humans are lazy. Instead of brute forcing, they start by hashing millions of common dictionary words and common replacements (e.g., `pa$$w0rd`).\n- **Rainbow Tables**: Re-computing hashes takes time. A Rainbow Table is a colossal, pre-computed database of billions of plaintext-to-hash mappings, trading massive disk space for instant lookup time."
+      },
+      {
+        "type": "concept",
+        "title": "The Solution: Salting",
+        "content": "To defeat Rainbow Tables, we use **Salting**. \nA salt is a randomly generated string created when the user registers. \n\nWe append the Salt to the password, hash them together, and store BOTH the Plaintext Salt and the Hash in the database.\n\nBecause the salt is unique, the precomputed hashes in the attacker's Rainbow Table are entirely useless. (Bcrypt handles salting and hashing automatically)."
+      },
+      {
+        "type": "quiz",
+        "question": "Does Salting a password increase its Entropy (making it harder for a targeted brute-force attack)?",
+        "options": [
+          "Yes, because the total length of the password string is longer.",
+          "No, because the salt is stored in plain text right next to the hash.",
+          "Yes, because Rainbow tables are defeated.",
+          "No, because salts are usually too short."
+        ],
+        "answer": 1,
+        "explanation": "Salting ONLY defeats Rainbow Tables. Because the salt is stored in plain text in the database, an attacker performing a targeted Brute Force or Dictionary attack on that specific user simply reads the salt and applies it to their guesses. It adds absolutely zero entropy against targeted attacks."
+      },
+      {
+        "type": "concept",
+        "title": "Tracking User Sessions",
+        "content": "How do we combine Cookies and Auth to remember users?\n\n1. User logs in (hashes match).\n2. Server generates a massive, random **Secret Token**.\n3. Server stores `{ username: \"Guest\", token: \"fd933...\" }` in the Database.\n4. Server responds with `Set-Cookie: token=fd933...; HttpOnly; Secure`.\n5. On subsequent requests, the Server reads the `Cookie` header, looks up `fd933...` in the Database, and instantly knows it's \"Guest\"."
+      }
+    ]
+  },
+  {
+    "id": "2_5_Authentication_Tokens",
+    "title": "Stateless Auth (JWTs & Tokens)",
+    "description": "Serverless memory using Cryptographic Signatures.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### Scaling the Bouncer\nImagine a club with a million guests. If the bouncer has to check the master guest list (Database) every single time a guest walks to the bar, the line stops moving.\n\nInstead, the Bouncer checks the guest list once at the door, and hands the guest a **tamper-proof wristband** (Token). Now, any bartender can verify the wristband without ever checking the main database. This is **Stateless Authentication**."
+      },
+      {
+        "type": "concept",
+        "title": "Tokens vs Sessions",
+        "content": "In traditional authentication, the server generates a random string (Session ID), saves it in the Database, and gives it to the Client. \nIn **Token Authentication**, the server generates a JSON object (e.g., `{ \"user\": 5, \"role\": \"admin\" }`), **cryptographically signs it** using a massive secret key, and hands the token to the client.\n\nBecause of the signature, the client CAN read the data, but CANNOT modify it. If they change `\"role\": \"user\"` to `\"role\": \"admin\"`, the cryptographic signature breaks, and the server instantly rejects it."
+      },
+      {
+        "type": "quiz",
+        "question": "If you send a client a signed JWT (JSON Web Token) that contains their email and user ID, can the client natively read that information using JavaScript?",
+        "options": [
+          "Yes. JWTs are usually just Base64 encoded, not encrypted.",
+          "No, because the Token is encrypted with the server's private key.",
+          "Yes, but only if they have the HttpOnly directive.",
+          "No, the browser automatically prevents reading tokens."
+        ],
+        "answer": 0,
+        "explanation": "Signatures provide Integrity, NOT Confidentiality. The data in a standard Token is encoded in Base64 (which is instantly readable by anyone). You should never put secret data (like a plaintext password or SSN) inside a JWT."
+      }
+    ]
+  },
+  {
+    "id": "2_8_XSRF",
+    "title": "XSRF: Cross-Site Request Forgery",
+    "description": "Tricking users into sending authorized requests.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### The Invisible Theft\nImagine you are logged into your bank (Bank.com). Your browser has a session cookie for Bank.com. \nYou browse to an attacker's site (Evil.com). Evil.com has a hidden `<form action=\"https://bank.com/transfer\">` that submits immediately via JavaScript.\n\nWhen the form submits to Bank.com, **your browser automatically attaches your Bank.com session cookie**. The bank sees a valid request from YOU, and transfers the money. This is **XSRF**."
+      },
+      {
+        "type": "concept",
+        "title": "Defense 1: SameSite Cookies",
+        "content": "The easiest defense against XSRF is the `SameSite` cookie directive.\n- **SameSite=Strict**: The browser will ONLY send the cookie if the user is currently on your domain. If Evil.com triggers a request to Bank.com, the browser strips the cookie out. The request fails as unauthenticated.\n- **SameSite=Lax**: Strips the cookie for POST requests from Evil.com, but keeps it for top-level GET navigation. (This is the default in modern browsers)."
+      },
+      {
+        "type": "quiz",
+        "question": "If you rely entirely on cookies for authentication, an attacker triggering a POST request from their website to your server is attempting an __ attack?",
+        "options": [
+          "XSS (Cross-Site Scripting)",
+          "XSRF (Cross-Site Request Forgery)",
+          "SQL Injection",
+          "DDoS"
+        ],
+        "answer": 1,
+        "explanation": "XSRF exploits the browser's automatic behavior of attaching cookies to cross-origin requests. XSS, by contrast, involves injecting malicious JS directly into your actual site."
+      },
+      {
+        "type": "concept",
+        "title": "Defense 2: Anti-XSRF Tokens",
+        "content": "If you cannot use SameSite cookies (e.g., older APIs), you use **Anti-XSRF Tokens**.\n1. When the server renders an HTML form, it generates a massive random string (the Token) and embeds it as a hidden field in the form.\n2. The server remembers this token in the user's session.\n3. When the user submits, they send the token. The server verifies it matches.\n Evil.com cannot see or guess this token, so their forged requests will be rejected."
+      }
+    ]
+  },
+  {
+    "id": "2_9_OAuth",
+    "title": "OAuth 2.0 Roles",
+    "description": "Understanding the actors in federated login.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "The Four Actors of OAuth",
+        "content": "To deeply understand OAuth, you must memorize the four specific roles:\n1. **Resource Owner**: That's YOU (the human user). You own data on GitHub.\n2. **Client**: The app trying to access your data (e.g., your CSE312 Midterm Prep App).\n3. **Authorization Server**: The system verifying your identity (GitHub's login page).\n4. **Resource Server**: The system actually holding the data (GitHub's API that returns your email address)."
+      },
+      {
+        "type": "concept",
+        "title": "Scope",
+        "content": "When the Client redirects the Resource Owner to the Authorization Server, it specifies a **Scope** in the URL.\nThe Scope dictates exactly what permissions the Client is asking for (e.g., `scope=user:email,read:org`). \nThe Authorization Server explicitly asks the Resource Owner: 'Are you absolutely sure you want to grant this specific Client these specific Scopes?'"
+      }
+    ]
+  },
+  {
+    "id": "2_10_OAuth",
+    "title": "OAuth 2.0: Federated Authentication",
+    "description": "Log In With Google/Github. Redirect URIs and State Parameters.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### Giving the keys without giving the password\nImagine staying at a hotel. Instead of the owner giving you the master key to the building, they give you a temporary keycard that only opens room 402 for 3 days. \n\n**OAuth (Open Authorization)** works like this. If a user clicks 'Log In With GitHub' on your app, they don't give your app their GitHub password. Instead, GitHub authenticates them, and gives your app a temporary 'keycard' (an Access Token) that just proves who they are."
+      },
+      {
+        "type": "concept",
+        "title": "The OAuth Dance",
+        "content": "1. User clicks \"Login with GitHub\". Your app Redirects (Status 302) the user to `github.com/login/oauth/authorize?client_id=123&redirect_uri=yourapp.com/github/callback`.\n2. User logs in on GitHub's secure servers. GitHub asks: \"Do you want to share your email with App 123?\"\n3. User clicks Yes. GitHub Redirects the user *back* to your `redirect_uri`, passing an **Authorization Code** in the URL.\n4. Your server takes that Code, adds your deeply secret `client_secret` (which never reaches the browser), and makes a secure backend POST request to GitHub.\n5. GitHub verifies the secret and the code, and replies with an **Access Token**."
+      },
+      {
+        "type": "quiz",
+        "question": "During the OAuth flow, why does your server exchange the Authorization Code for an Access Token via a secure backend API call, rather than GitHub just giving the Access Token directly to the user's browser?",
+        "options": [
+          "Because Access Tokens are too large for URL parameters.",
+          "Because the browser cannot parse JSON.",
+          "Because exchanging the code requires your 'client_secret', which you must never expose to the front-end.",
+          "Because GitHub does not allow cross-origin requests."
+        ],
+        "answer": 2,
+        "explanation": "Your Client Secret password proves to GitHub that the request is genuinely from your server. If you put the Client Secret in the browser, anyone could steal it and impersonate your app."
+      }
+    ]
+  },
+  {
+    "id": "2_11_OAuth",
+    "title": "OAuth Under the Hood",
+    "description": "Client IDs and Security Implications.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "Client ID vs Client Secret",
+        "content": "Every OAuth Client is assigned two keys by the Authorization Server when registering:\n- **Client ID**: A public identifier. This is safe to put in URLs and HTML. It simply tells GitHub which app is asking for login.\n- **Client Secret**: A deeply private password. This MUST NEVER leave your backend server. It is used exclusively in server-to-server POST requests to exchange an Authorization Code for an Access Token."
+      },
+      {
+        "type": "quiz",
+        "question": "If an attacker discovers your OAuth Client ID (by reading the URL when clicking Login), can they steal your users' accounts?",
+        "options": [
+          "Yes, they can forge login requests.",
+          "Yes, the Client ID grants full administrative access.",
+          "No, the Client ID is public by design.",
+          "No, because they still need the user's password."
+        ],
+        "answer": 2,
+        "explanation": "The Client ID is strictly public information (it is naturally exposed in the redirect URL). The true security relies on the Client Secret, which stays hidden on the backend."
+      }
+    ]
+  },
+  {
+    "id": "3_1_multipart_files",
+    "title": "Multipart Form Data (Deep Dive)",
+    "description": "Uploading Images and Boundaries.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "Why we need Multipart",
+        "content": "A standard `<form>` uses `application/x-www-form-urlencoded`. But if you want to upload a massive image file alongside a username and password, URL-encoding breaks down. Images are raw binary bytes, and URL-encoding strictly uses ASCII.\n\nTo solve this, we use `enctype=\"multipart/form-data\"`.\nThis tells the browser: 'I am sending multiple different parts of data. Some are text, some are binary.'"
+      },
+      {
+        "type": "concept",
+        "title": "The Boundary String",
+        "content": "When parsing multipart data on the backend, you must split the massive HTTP Body into individual pieces (e.g., the 'username' part and the 'profile_pic.png' part).\n\nTo do this, the browser generates a massive random string called a **Boundary**. It puts this boundary in the `Content-Type` header: \n`Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW`\n\nInside the body, the browser inserts this exact boundary string to separate the different fields. Your server literally reads the Content-Type, extracts the boundary string, and runs `.split(boundary.encode())` on the binary body."
+      },
+      {
+        "type": "quiz",
+        "question": "What happens if a user uploads a text file that magically contains the exact same text as the Browser's generated Boundary string?",
+        "options": [
+          "The server will freeze in an infinite loop.",
+          "The file uploads instantly.",
+          "The parser breaks because it mistakenly believes the file has ended and a new field has begun.",
+          "The browser detects it and crashes."
+        ],
+        "answer": 2,
+        "explanation": "If the boundary appears naturally in the payload data, it causes a collision and corrupts the parsing. This is why browsers generate massive, cryptographically random boundary strings to ensure a collision probability of virtually zero."
+      }
+    ]
+  },
+  {
+    "id": "3_3_WebSocket_Handshake",
+    "title": "WebSocket Handshake (Deep Dive)",
+    "description": "Upgrading HTTP to a persistent connection.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### Tearing down the walls\nHTTP is strictly Request-Response. If the server wants to send new chat messages to the client, it cannot do it until the client explicitly asks. \n\n**WebSockets** fundamentally alter this. A WebSocket connection starts exactly like a standard HTTP request. But inside the headers, the client shouts: \"Hey server, I want to Upgrade this HTTP line into a WebSocket!\" If the server agrees, the HTTP protocol is thrown away, and the exact same TCP socket is held open for real-time, two-way, persistent communication."
+      },
+      {
+        "type": "concept",
+        "title": "The Upgrade Request",
+        "content": "The client initiates the handshake with a standard `GET` request containing specific headers:\n- `Connection: Upgrade`\n- `Upgrade: websocket`\n- `Sec-WebSocket-Key: <base64_random_string>`\n\nWithout these headers, it's just a normal HTTP request."
+      },
+      {
+        "type": "concept",
+        "title": "The Server's Mathematical Proof",
+        "content": "To prove to the client that the server *actually* understands WebSockets (and isn't just a confused HTTP server), the server MUST perform a specific math operation:\n1. Read the client's `Sec-WebSocket-Key`.\n2. Append a globally fixed Magic String: `258EAFA5-E914-47DA-95CA-C5AB0DC85B11`.\n3. Hash the concatenated string using **SHA-1**.\n4. Encode that hash in **Base64**.\n5. Send it back in the `Sec-WebSocket-Accept` header alongside a `101 Switching Protocols` status code.\n\nIf the math is even slightly wrong, the browser instantly drops the connection."
+      },
+      {
+        "type": "quiz",
+        "question": "What Status Code does a server send to finalize a successful WebSocket Handshake?",
+        "options": [
+          "200 OK",
+          "301 Moved Permanently",
+          "101 Switching Protocols",
+          "426 Upgrade Required"
+        ],
+        "answer": 2,
+        "explanation": "A 101 Switching Protocols explicitly tells the browser: 'I acknowledge the Upgrade request, and we are now conversing in WebSockets over this exact TCP socket.'"
+      }
+    ]
+  },
+  {
+    "id": "3_4_WebSocket_Frames",
+    "title": "WebSocket Framing",
+    "description": "How continuous TCP streams are chopped into discrete WebSocket messages.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### Chopping the Stream\nBecause TCP is a continuous stream of raw bytes, WebSockets must implement **Framing** to re-create the concept of discrete 'Messages'. \nA Frame is a strict sequence of bits. The first few bits metadata (Is this the end of the message? Is it text or binary? Is it masked?), and the rest of the bits are the actual payload."
+      },
+      {
+        "type": "concept",
+        "title": "The First Byte",
+        "content": "When reading a WebSocket frame, the absolute first byte (8 bits) dictates the message state:\n- **FIN Bit (1st bit)**: If `1`, this is the final piece of the message. If `0`, expect more frames to follow.\n- **RSV1, RSV2, RSV3 (2nd, 3rd, 4th bits)**: Reserved for extensions. Always `0` for our assignments.\n- **Opcode (Last 4 bits)**: Dictates what type of data this is. \n  - `0001` (1) = Text Frame.\n  - `0010` (2) = Binary Frame.\n  - `1000` (8) = Connection Close."
+      },
+      {
+        "type": "quiz",
+        "question": "If you read the very first byte of a WebSocket frame and it precisely equates to the binary value 10000001 (Decimal 129), what kind of frame is this?",
+        "options": [
+          "A fragmented binary message.",
+          "A final text message.",
+          "A ping request.",
+          "A connection close."
+        ],
+        "answer": 1,
+        "explanation": "10000001 means the FIN bit is 1 (Final fragment), the RSV bits are 000, and the Opcode is 0001 (Text). This is a completed, unfragmented text message!"
+      }
+    ]
+  },
+  {
+    "id": "3_5_Buffers",
+    "title": "Buffers & Binary Data",
+    "description": "Controlling the Matrix.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "TCP Streams vs HTTP Messages",
+        "content": "An HTTP message is a distinct block of data with a start and a finish (measured by Content-Length).\nBut TCP (the underlying protocol) doesn't know what HTTP is. TCP just streams raw bytes endlessly. \n\nWhen your Python/Node server calls `recv(1024)`, there is **no guarantee** that you receive the entirety of an HTTP request in one go. You might receive half the headers, and have to call `recv` again to get the rest. You must store all these incoming bytes in a **Buffer** until you have mathematically verified (via `\\r\\n\\r\\n` and `Content-Length`) that you have reached the end of the message."
+      },
+      {
+        "type": "quiz",
+        "question": "If your client sends a 5MB image over an HTTP POST request, is your server guaranteed to read the entire 5MB if you just call `.recv(1024)` in a loop until there is an empty string?",
+        "options": [
+          "Yes, because HTTP automatically concatenates packets.",
+          "Yes, unless the network drops.",
+          "No. A router in the middle might stall, causing `.recv` to return early. You must continually check the total bytes received against the `Content-Length` header.",
+          "No, images must be sent over UDP."
+        ],
+        "answer": 2,
+        "explanation": "TCP streaming is unpredictable. Packets arrive in bursts, and `.recv()` will return whatever bytes happen to be sitting in your computer's network card buffer at that exact microsecond. The ONLY way to know you are done is to count the bytes received and compare it strictly against the parsed `Content-Length` header."
+      }
+    ]
+  },
+  {
+    "id": "3_5_WebSocket_Buffers",
+    "title": "Decoding WebSocket Length",
+    "description": "The nightmare of bitwise operators and 64-bit lengths.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "The Payload Length Math",
+        "content": "The second byte of a WebSocket frame contains the **Mask Bit** and the **Payload Length**.\n\nBecause WebSockets can send everything from a 1-byte letter to a 5-Gigabyte 4K movie, the Payload Length field dynamically expands:\n1. Read the 7-bit length (`byte[1] & 127`).\n2. If it is `<= 125`, that's the length.\n3. If it is exactly `126`, read the next **2 bytes** as a 16-bit unsigned integer.\n4. If it is exactly `127`, read the next **8 bytes** as a 64-bit unsigned integer."
+      },
+      {
+        "type": "concept",
+        "title": "Masking to Prevent Cache Poisoning",
+        "content": "Security Rule: **All messages from Client to Server MUST be masked.**\nIf the server receives an unmasked frame from a client, it must instantly drop the connection.\n\nMasking uses an XOR cipher. The client generates a random 4-byte key. The server reads this 4-byte key and applies an XOR bitwise operation against every byte of the payload to reveal the true text. This prevents intermediate proxy servers from accidentally caching malicious HTTP-like plaintext that happens to be embedded inside a TCP WebSocket frame."
+      }
+    ]
+  },
+  {
+    "id": "3_6_Video1",
+    "title": "Streaming Video Basics",
+    "description": "MP4 vs Streaming, HTML5 `<video>` tags.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "The Problem with MP4",
+        "content": "An `.mp4` file is a rigid container. Historically, if a user wanted to watch a 2-hour movie, their browser had to download the entire multi-gigabyte `.mp4` file before playback could reliably begin.\n\nModern video relies on **Streaming**. The video isn't sent as one monolithic file. It is broken into tiny, 5-second chunks (Manifest files) that the browser requests individually."
+      }
+    ]
+  },
+  {
+    "id": "3_6_Video2",
+    "title": "Advanced Video (HLS & DASH)",
+    "description": "How Netflix changes video quality on the fly.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "Adaptive Bitrate Streaming",
+        "content": "Protocols like **HLS (HTTP Live Streaming)** and **DASH** solve the ultimate networking problem: Fluctuating WiFi.\n\n1. The server encodes the same 5-second video chunk at 4K, 1080p, 720p, and 480p.\n2. The server provides a Manifest file listing all these chunks.\n3. The Client's browser actively monitors its download speed. \n4. If the WiFi drops, the Client automatically requests the next 5-second chunk at 480p instead of 1080p, ensuring the video NEVER pauses to buffer."
+      },
+      {
+        "type": "quiz",
+        "question": "In Adaptive Bitrate Streaming (like HLS), who makes the decision to switch the video quality from 1080p to 480p?",
+        "options": [
+          "The Server.",
+          "The Client (The Browser/Video Player).",
+          "The Internet Service Provider (ISP).",
+          "The CDN Load Balancer."
+        ],
+        "answer": 1,
+        "explanation": "The Client is intrinsically aware of how fast its buffers are emptying and filling. It continuously calculates its bandwidth and autonomously requests the appropriate resolution chunk from the server."
+      }
+    ]
+  },
+  {
+    "id": "REC_2_HW1",
+    "title": "Recitation: HW1 Tips (HTTP)",
+    "description": "Reminders on the CRLF trap.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "The Python .split() Trap",
+        "content": "In early assignments, students typically use `request.split(\"\\r\\n\\r\\n\")` to separate HTTP headers from the Body.\n\n**CRITICAL FLAW**: If a user uploads an image (which is raw binary data), that image might randomly contain the binary equivalent of `\\r\\n\\r\\n` directly inside its pixels! If you split the entire request strictly as a string, you will rip the image file in half.\n\n**Fix**: You must safely split exactly ONCE at the first occurrence of `\\r\\n\\r\\n` and treat the remainder exclusively as raw bytes."
+      }
+    ]
+  },
+  {
+    "id": "REC_10_HW4_websockets",
+    "title": "Recitation: HW4 Tips (WebSockets)",
+    "description": "Reviewing Concurrency and Math for your assignments.",
+    "modules": [
+      {
+        "type": "concept",
+        "title": "The Framing Nightmare",
+        "content": "When doing HW4, the single biggest point of failure is **Bitwise Math** in Python/Node.\n- You cannot use normal string manipulation.\n- In Python, `bytearray` and `int.to_bytes` are your best friends.\n- Remember that the payload length dictates the offsets. If the length is `< 126`, your masking key starts at Byte 2. If the length is `126`, your masking key starts at Byte 4! You MUST calculate offsets dynamically, never hardcode them."
+      }
+    ]
+  },
+  {
+    "id": "REC_MT_REVIEW",
+    "title": "Mega Midterm Capstone",
+    "description": "The Final Checklist. You are ready.",
+    "modules": [
+      {
+        "type": "story",
+        "content": "### You have reached the end.\nEvery slide, every quirk, every bitwise operation, and every HTTP constraint has been fully deeply covered in this application.\n\nRun through the Quizzes on Cookies, APIs, XSRF, Databases, Docker, and WebSockets. If you understand the difference between Idempotency in POST and PUT, the difference between Encryption and Hashing, and how to verify a WebSocket upgrade using SHA-1... you will get a 100 on the exam."
+      }
+    ]
+  }
+]
