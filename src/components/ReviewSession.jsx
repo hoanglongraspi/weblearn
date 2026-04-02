@@ -257,7 +257,7 @@ function LessonStep({ module }) {
         <div className="study-subpanel" style={{ marginBottom: '24px' }}>
           <div className="study-panel-title">
             <ListChecks size={18} />
-            Lesson Snapshot
+            Key Takeaways
           </div>
           <ul className="rich-list">
             {module.summary.map((point) => (
@@ -276,41 +276,27 @@ function LessonStep({ module }) {
             </div>
 
             <div className="source-slide-body">
-              {section.teachingText.map((paragraph, index) => (
-                <p key={`${section.id}-paragraph-${index}`}>{paragraph}</p>
-              ))}
-            </div>
-
-            {!!section.bulletCoverage.length && (
-              <div className="study-subpanel" style={{ marginTop: '16px' }}>
-                <div className="study-panel-title">
-                  <Layers3 size={18} />
-                  Full Coverage
-                </div>
-                <ul className="rich-list" style={{ marginBottom: 0 }}>
-                  {section.bulletCoverage.map((point) => (
-                    <li key={`${section.id}-${point}`}>{point}</li>
-                  ))}
+              {section.bullets && section.bullets.length > 0 ? (
+                <ul className="rich-list" style={{ margin: '8px 0 0', paddingLeft: '4px' }}>
+                  {section.bullets.map((point, idx) =>
+                    section.isBullet?.[idx] !== false ? (
+                      <li key={idx}>{point}</li>
+                    ) : (
+                      <p key={idx} style={{ margin: '4px 0' }}>{point}</p>
+                    )
+                  )}
                 </ul>
-              </div>
-            )}
+              ) : (
+                <p style={{ color: 'var(--text-muted)', fontStyle: 'italic', margin: 0 }}>
+                  Title / transition slide — no additional bullet content.
+                </p>
+              )}
+            </div>
           </article>
         ))}
       </div>
 
-      {!!module.coveragePoints?.length && (
-        <div className="study-subpanel" style={{ marginTop: '24px' }}>
-          <div className="study-panel-title">
-            <CheckCircle size={18} />
-            Everything Covered In This Lesson
-          </div>
-          <ul className="rich-list" style={{ marginBottom: 0 }}>
-            {module.coveragePoints.map((point) => (
-              <li key={`coverage-${point}`}>{point}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+
 
       <details className="study-subpanel" style={{ marginTop: '24px' }}>
         <summary style={{ cursor: 'pointer', fontWeight: 700, color: 'var(--text-main)' }}>
@@ -336,12 +322,12 @@ function LessonStep({ module }) {
                     ),
                   )}
                 </div>
-            ) : (
-              <p className="source-slide-empty">This slide mainly acts as a title or framing transition for the subtopic.</p>
-            )}
-          </article>
-        ))}
-      </div>
+              ) : (
+                <p className="source-slide-empty">This slide mainly acts as a title or framing transition for the subtopic.</p>
+              )}
+            </article>
+          ))}
+        </div>
       </details>
     </>
   );

@@ -1,4 +1,5 @@
 import enhancedTopics from '../assets/enhanced-content.json';
+import extraQuizzes from '../assets/extra-quizzes.json';
 import slideDecks from '../assets/slides.json';
 
 const BULLET_PREFIX = /^[•●○■-]\s*/;
@@ -153,55 +154,15 @@ function buildSlideClusters(slides = []) {
 }
 
 function buildLectureSection(slide, slideIndex) {
-  const points = slide.items.map((item) => stripMarkdown(item.text)).filter(Boolean);
-  const isTitledSlide = !/^Slide \d+$/.test(slide.title);
+  const points = slide.items.map((item) => item.text).filter(Boolean);
   const label = slide.slideNumber ? `Slide ${slide.slideNumber}` : `Part ${slideIndex + 1}`;
-
-  if (!points.length) {
-    return {
-      id: `${slide.slideNumber || slideIndex}-lecture`,
-      label,
-      title: slide.title,
-      teachingText: [
-        isTitledSlide
-          ? withPeriod(`${slide.title} acts as the transition that frames the next subtopic`)
-          : 'This part introduces the next subtopic and sets up the details that follow.',
-      ],
-      bulletCoverage: [],
-    };
-  }
-
-  const [firstPoint, ...restPoints] = points;
-  const teachingText = [];
-
-  if (isTitledSlide) {
-    teachingText.push(withPeriod(`This lesson segment is centered on ${slide.title}`));
-  }
-
-  teachingText.push(withPeriod(`The first thing to lock in is: ${firstPoint}`));
-
-  if (restPoints.length) {
-    teachingText.push(
-      withPeriod(
-        `The slide then expands the idea with these supporting details: ${restPoints.slice(0, 2).join('; ')}`,
-      ),
-    );
-  }
-
-  if (restPoints.length > 2) {
-    teachingText.push(
-      withPeriod(
-        `For complete coverage, also remember: ${restPoints.slice(2).join('; ')}`,
-      ),
-    );
-  }
 
   return {
     id: `${slide.slideNumber || slideIndex}-lecture`,
     label,
     title: slide.title,
-    teachingText,
-    bulletCoverage: points,
+    bullets: points,           // raw bullet text from the slide
+    isBullet: slide.items.map((item) => item.bullet),  // preserve bullet/plain distinction
   };
 }
 
@@ -397,19 +358,22 @@ function buildInterleavedModules(topic, overview, conceptModules, lessonModules,
   lessonModules.forEach((lesson, lessonIndex) => {
     modules.push(lesson);
 
-    const pairedQuiz =
-      authoredQuizzes[lessonIndex] ||
-      buildGeneratedLessonQuiz(topic, lesson, lessonIndex, conceptModules, lessonModules);
-
-    modules.push({
-      ...pairedQuiz,
-      id: pairedQuiz.id || `quiz-${lessonIndex + 1}`,
-      type: 'quiz',
-      title: pairedQuiz.title || `Quick Check ${lessonIndex + 1}`,
-      navLabel: pairedQuiz.navLabel || `Quiz ${lessonIndex + 1}`,
-    });
+    // Only insert a quiz if there is a hand-authored one for this slot.
+    // Auto-generated quizzes used raw slide bullet text as options and
+    // produced nonsense choices, so we skip them entirely.
+    const pairedQuiz = authoredQuizzes[lessonIndex];
+    if (pairedQuiz) {
+      modules.push({
+        ...pairedQuiz,
+        id: pairedQuiz.id || `quiz-${lessonIndex + 1}`,
+        type: 'quiz',
+        title: pairedQuiz.title || `Quick Check ${lessonIndex + 1}`,
+        navLabel: pairedQuiz.navLabel || `Quiz ${lessonIndex + 1}`,
+      });
+    }
   });
 
+  // If there were no lesson clusters (topic has no slide deck), add all authored quizzes.
   if (!lessonModules.length) {
     authoredQuizzes.forEach((quiz, index) => {
       modules.push({
@@ -421,6 +385,7 @@ function buildInterleavedModules(topic, overview, conceptModules, lessonModules,
       });
     });
   } else if (authoredQuizzes.length > lessonModules.length) {
+    // Extra authored quizzes beyond lesson count — append them at the end.
     authoredQuizzes.slice(lessonModules.length).forEach((quiz, index) => {
       const quizNumber = lessonModules.length + index + 1;
       modules.push({
@@ -437,9 +402,14 @@ function buildInterleavedModules(topic, overview, conceptModules, lessonModules,
 }
 
 const studyTopics = enhancedTopics.map((topic) => {
+  // Merge any extra hand-crafted quizzes for this topic
+  const extra = extraQuizzes[topic.id] || [];
+  const topicWithExtras = extra.length
+    ? { ...topic, modules: [...topic.modules, ...extra] }
+    : topic;
   const slideDeck = slideDeckById[topic.id];
   const lessonModules = buildSlideClusters(slideDeck?.slides || []);
-  const conceptModules = topic.modules
+  const conceptModules = topicWithExtras.modules
     .filter((module) => module.type === 'concept')
     .map((module, index) => ({
       ...module,
@@ -447,7 +417,7 @@ const studyTopics = enhancedTopics.map((topic) => {
       navLabel: `Core ${index + 1}`,
       keyTerms: extractKeyTerms(module.content),
     }));
-  const quizzes = topic.modules
+  const quizzes = topicWithExtras.modules
     .filter((module) => module.type === 'quiz')
     .map((module, index) => ({
       ...module,
@@ -456,7 +426,7 @@ const studyTopics = enhancedTopics.map((topic) => {
       title: module.title || `Checkpoint ${index + 1}`,
     }));
 
-  const overview = buildOverviewModule(topic, lessonModules);
+  const overview = buildOverviewModule(topicWithExtras, lessonModules);
   const modules = buildInterleavedModules(topic, overview, conceptModules, lessonModules, quizzes);
   const totalQuizzes = modules.filter((module) => module.type === 'quiz').length;
 

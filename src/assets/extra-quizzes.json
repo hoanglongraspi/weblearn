@@ -1,0 +1,518 @@
+{
+    "1_0_TCPIP": [
+        {
+            "type": "quiz",
+            "question": "HTTP relies on TCP rather than UDP because:",
+            "options": [
+                "TCP is faster",
+                "TCP guarantees reliable ordered delivery",
+                "UDP has no port numbers",
+                "HTTP packets are too large for UDP"
+            ],
+            "answer": 1,
+            "explanation": "HTTP messages must arrive complete and in order. TCP's retransmission and ordering guarantees this. UDP drops packets silently, which would corrupt web pages."
+        },
+        {
+            "type": "quiz",
+            "question": "Port 443 is conventionally used for which protocol?",
+            "options": [
+                "HTTP",
+                "FTP",
+                "SSH",
+                "HTTPS"
+            ],
+            "answer": 3,
+            "explanation": "HTTPS (HTTP over TLS) defaults to port 443. Plain HTTP defaults to port 80. Ports let multiple services share one IP address."
+        }
+    ],
+    "1_1_HTTP": [
+        {
+            "type": "quiz",
+            "question": "A server responds 302. What must the client do?",
+            "options": [
+                "Show error",
+                "Retry exact request",
+                "Follow Location header to new URL",
+                "Close connection"
+            ],
+            "answer": 2,
+            "explanation": "302 Found is a redirect. The browser sends a new GET to the URL in the Location header automatically."
+        },
+        {
+            "type": "quiz",
+            "question": "Which header tells the browser how many bytes are in the response body?",
+            "options": [
+                "Accept",
+                "Content-Type",
+                "Content-Length",
+                "Transfer-Encoding"
+            ],
+            "answer": 2,
+            "explanation": "Content-Length declares the byte count of the body. Without it the receiver cannot tell when the body ends."
+        }
+    ],
+    "1_2_Encodings": [
+        {
+            "type": "quiz",
+            "question": "You set Content-Length = len('café') = 4 in Python. Is this correct?",
+            "options": [
+                "Yes, one char = one byte",
+                "No — 'é' is 2 bytes in UTF-8, so it should be 5",
+                "No — use Base64 for non-ASCII",
+                "Yes, Python is always ASCII"
+            ],
+            "answer": 1,
+            "explanation": "len() counts code points, not bytes. Always call content.encode() first, then len() on the bytes object."
+        },
+        {
+            "type": "quiz",
+            "question": "Why is X-Content-Type-Options: nosniff a security requirement?",
+            "options": [
+                "It compresses responses",
+                "It stops browsers from executing files as scripts when Content-Type is wrong",
+                "It prevents SQL injection",
+                "It encrypts cookies"
+            ],
+            "answer": 1,
+            "explanation": "Without nosniff, a browser might sniff an uploaded file, decide it looks like JS, and execute it — enabling XSS. nosniff forces the browser to trust only the declared Content-Type."
+        }
+    ],
+    "1_3_POST": [
+        {
+            "type": "quiz",
+            "question": "An HTML form without enctype submits. Which Content-Type is used?",
+            "options": [
+                "multipart/form-data",
+                "application/json",
+                "application/x-www-form-urlencoded",
+                "text/plain"
+            ],
+            "answer": 2,
+            "explanation": "The browser defaults to application/x-www-form-urlencoded. The body looks like a query string: key1=val1&key2=val2."
+        },
+        {
+            "type": "quiz",
+            "question": "A fetch() POST uses Content-Type: application/json. The body contains:",
+            "options": [
+                "URL-encoded pairs",
+                "A multipart boundary",
+                "A JSON string",
+                "Base64 data"
+            ],
+            "answer": 2,
+            "explanation": "With application/json the body is a raw JSON string like {\"username\":\"alice\"}. The server must use a JSON parser, not a form-data parser."
+        }
+    ],
+    "1_4_Databases": [
+        {
+            "type": "quiz",
+            "question": "In MongoDB, what is equivalent to a SQL table?",
+            "options": [
+                "Document",
+                "Collection",
+                "Schema",
+                "Row"
+            ],
+            "answer": 1,
+            "explanation": "MongoDB organises data into Collections (≈tables) holding Documents (≈rows) stored as BSON (Binary JSON) without a fixed schema."
+        },
+        {
+            "type": "quiz",
+            "question": "Why does MongoDB resist classic SQL injection?",
+            "options": [
+                "It encrypts queries",
+                "Queries are JSON objects not raw strings",
+                "It has no query language",
+                "It runs on localhost only"
+            ],
+            "answer": 1,
+            "explanation": "SQL injection works by injecting code into a concatenated string. MongoDB queries are native dict/JSON structures so user input maps to values, never to executable code."
+        }
+    ],
+    "1_5_API": [
+        {
+            "type": "quiz",
+            "question": "You send DELETE /api/messages/5 three times. Idempotency means:",
+            "options": [
+                "Three records created",
+                "Second call returns 201",
+                "End state is same as after one call",
+                "Server throws 409 on second call"
+            ],
+            "answer": 2,
+            "explanation": "An idempotent operation leaves the server in the same state no matter how many times it is called. After message 5 is gone, calling delete again changes nothing."
+        },
+        {
+            "type": "quiz",
+            "question": "Which HTTP method is correct to fully replace a resource?",
+            "options": [
+                "POST",
+                "PATCH",
+                "PUT",
+                "DELETE"
+            ],
+            "answer": 2,
+            "explanation": "PUT replaces the entire resource. PATCH applies a partial update. POST creates a new resource. DELETE removes it."
+        }
+    ],
+    "1_6_Cookies": [
+        {
+            "type": "quiz",
+            "question": "A cookie is set with Max-Age=0. What happens?",
+            "options": [
+                "Lasts forever",
+                "Deleted immediately",
+                "Expires in 1 second",
+                "Browser ignores it"
+            ],
+            "answer": 1,
+            "explanation": "Max-Age=0 tells the browser to delete the cookie immediately — the correct server-side logout mechanism."
+        },
+        {
+            "type": "quiz",
+            "question": "SameSite=Lax allows a cookie to be sent when:",
+            "options": [
+                "Any cross-site POST",
+                "Any cross-site request",
+                "Top-level GET navigation from another site",
+                "Never cross-site"
+            ],
+            "answer": 2,
+            "explanation": "Lax blocks cross-site subresource requests and POSTs but allows the cookie on top-level navigations (clicking a link). Strict blocks even that."
+        }
+    ],
+    "1_7_Docker": [
+        {
+            "type": "quiz",
+            "question": "You run a container with -p 3000:80. How do you reach the server from your host?",
+            "options": [
+                "localhost:80",
+                "localhost:3000",
+                "container:80",
+                "docker:3000"
+            ],
+            "answer": 1,
+            "explanation": "Port mapping -p HOST:CONTAINER forwards host port 3000 to container port 80. Visit localhost:3000 on your machine."
+        },
+        {
+            "type": "quiz",
+            "question": "A MongoDB container is stopped and removed. What happens to its data?",
+            "options": [
+                "Persists automatically",
+                "Lost unless a Docker Volume was used",
+                "Saved in the image",
+                "Moved to backup container"
+            ],
+            "answer": 1,
+            "explanation": "Containers are ephemeral — filesystem changes are lost on removal. Volumes mount a host directory into the container so data survives."
+        }
+    ],
+    "2_4_Authentication": [
+        {
+            "type": "quiz",
+            "question": "Why is bcrypt preferred over SHA-256 for password hashing?",
+            "options": [
+                "bcrypt produces shorter hashes",
+                "bcrypt is intentionally slow making brute-force expensive",
+                "SHA-256 doesn't support salting",
+                "bcrypt encrypts while SHA-256 encodes"
+            ],
+            "answer": 1,
+            "explanation": "SHA-256 is fast — good for checksums, terrible for passwords. bcrypt is deliberately slow (tunable cost), making millions-of-guesses attacks infeasible."
+        },
+        {
+            "type": "quiz",
+            "question": "After login, what should the server store in the database for the auth token?",
+            "options": [
+                "Plaintext token",
+                "A salted bcrypt hash",
+                "An unsalted SHA-256 hash",
+                "AES-encrypted token"
+            ],
+            "answer": 2,
+            "explanation": "Per HW2: store an unsalted hash of the token. Tokens are already high-entropy random values so salting adds nothing, but hashing means a DB breach doesn't expose live session tokens."
+        }
+    ],
+    "2_5_Authentication_Tokens": [
+        {
+            "type": "quiz",
+            "question": "Token auth is called stateless because:",
+            "options": [
+                "The token holds no data",
+                "The server needs no session table — all info is in the signed token",
+                "The client stores nothing",
+                "Tokens expire automatically"
+            ],
+            "answer": 1,
+            "explanation": "With session auth the server stores a lookup table. With signed tokens the server verifies the cryptographic signature without storing anything, enabling horizontal scaling."
+        }
+    ],
+    "2_8_XSRF": [
+        {
+            "type": "quiz",
+            "question": "Why do XSRF attacks work against cookie-based auth?",
+            "options": [
+                "Cookies travel over HTTP",
+                "Browsers auto-attach cookies to every matching-domain request regardless of which site triggered it",
+                "Cookies aren't encrypted",
+                "Attackers can read cookies with JS"
+            ],
+            "answer": 1,
+            "explanation": "Browsers attach cookies automatically even if evil.com triggers a request to bank.com. The bank sees a valid cookie and processes the forged request."
+        }
+    ],
+    "2_9_OAuth": [
+        {
+            "type": "quiz",
+            "question": "In OAuth 2.0, who is the 'Resource Owner'?",
+            "options": [
+                "Your app server",
+                "GitHub's API",
+                "The human user who owns data on GitHub",
+                "The browser"
+            ],
+            "answer": 2,
+            "explanation": "The Resource Owner is the user who owns the data. In Login with GitHub, you own your GitHub profile and you grant the app limited access to it."
+        },
+        {
+            "type": "quiz",
+            "question": "What does the 'scope' parameter in an OAuth request control?",
+            "options": [
+                "Token format",
+                "Which permissions the client is requesting",
+                "Code expiry time",
+                "Redirect URI validation"
+            ],
+            "answer": 1,
+            "explanation": "Scope limits what the access token can do — e.g. user:email grants only email access, not repo access. Users see exactly what they are granting."
+        }
+    ],
+    "2_10_OAuth": [
+        {
+            "type": "quiz",
+            "question": "What is the OAuth 'state' parameter used for?",
+            "options": [
+                "Store session ID",
+                "Prevent CSRF on the OAuth callback",
+                "Encode requested scopes",
+                "Identify the client app"
+            ],
+            "answer": 1,
+            "explanation": "State is a random value sent to the auth server and echoed back. Verifying it on callback prevents an attacker from forging the redirect and linking their account to your session."
+        }
+    ],
+    "2_11_OAuth": [
+        {
+            "type": "quiz",
+            "question": "Your client_secret is committed to a public GitHub repo. The risk is:",
+            "options": [
+                "None — secrets are public like client IDs",
+                "Attackers can impersonate your app and exchange codes for tokens",
+                "The secret expires automatically",
+                "GitHub blocks it"
+            ],
+            "answer": 1,
+            "explanation": "The client_secret proves your identity to the auth server. If stolen, attackers can exchange authorization codes they intercept and access your users' data. Store secrets in environment variables."
+        }
+    ],
+    "3_1_multipart_files": [
+        {
+            "type": "quiz",
+            "question": "Why must each multipart part's content stay as bytes, never decoded to a string?",
+            "options": [
+                "Strings can't hold large data",
+                "Binary files contain byte sequences that are invalid UTF-8 and would be corrupted",
+                "Python doesn't support multipart strings",
+                "Boundaries are bytes-only"
+            ],
+            "answer": 1,
+            "explanation": "Images and videos contain arbitrary bytes. Many sequences are not valid UTF-8 — calling .decode() raises an error or silently corrupts binary data."
+        },
+        {
+            "type": "quiz",
+            "question": "Where do you find the boundary string for a multipart request?",
+            "options": [
+                "In the request body first line",
+                "In the Content-Type header value",
+                "In the Content-Length header",
+                "In a Boundary header"
+            ],
+            "answer": 1,
+            "explanation": "Content-Type: multipart/form-data; boundary=XYZ declares the boundary. Parse the Content-Type header first, extract the boundary, then use it to split the body into parts."
+        }
+    ],
+    "3_3_WebSocket_Handshake": [
+        {
+            "type": "quiz",
+            "question": "Sec-WebSocket-Accept is computed by:",
+            "options": [
+                "Base64 of the client key",
+                "SHA-1(key + magic GUID) then Base64",
+                "HMAC-SHA256 with server secret",
+                "MD5 of client IP + key"
+            ],
+            "answer": 1,
+            "explanation": "Concatenate Sec-WebSocket-Key with the fixed GUID 258EAFA5-E914-47DA-95CA-C5AB0DC85B11, SHA-1 hash it, then Base64-encode. This proves the server understands WebSocket."
+        },
+        {
+            "type": "quiz",
+            "question": "After the 101 response, what happens to the HTTP protocol on that connection?",
+            "options": [
+                "Used for all further messages",
+                "Replaced — the TCP socket switches to WebSocket frames",
+                "Closed, new UDP socket opened",
+                "Kept open in parallel"
+            ],
+            "answer": 1,
+            "explanation": "101 Switching Protocols is the last HTTP exchange. The same TCP connection is then reused for bidirectional WebSocket frames — no new connection is created."
+        }
+    ],
+    "3_4_WebSocket_Frames": [
+        {
+            "type": "quiz",
+            "question": "Client-to-server WebSocket frames MUST be:",
+            "options": [
+                "Compressed with gzip",
+                "Masked with a 4-byte XOR key",
+                "Encrypted with AES-256",
+                "Sent in pairs"
+            ],
+            "answer": 1,
+            "explanation": "The WebSocket spec requires all client-to-server frames to be masked. The MASK bit is set and a 4-byte key follows. Server-to-client frames are unmasked."
+        },
+        {
+            "type": "quiz",
+            "question": "A WebSocket frame opcode is 0x8. This means:",
+            "options": [
+                "Text frame",
+                "Binary frame",
+                "Connection Close frame",
+                "Ping frame"
+            ],
+            "answer": 2,
+            "explanation": "Opcode 0x8 is Connection Close. 0x1 = text, 0x2 = binary, 0x9 = ping, 0xA = pong. Recognising opcodes is essential for a correct implementation."
+        }
+    ],
+    "3_5_Buffers": [
+        {
+            "type": "quiz",
+            "question": "How does your server know it has received the complete HTTP request body?",
+            "options": [
+                "recv() returns empty string",
+                "Total bytes received after headers equals Content-Length",
+                "After calling recv() three times",
+                "When TCP connection closes"
+            ],
+            "answer": 1,
+            "explanation": "Parse Content-Length from the header block, then loop calling recv() and accumulate bytes until you have exactly Content-Length bytes. Only then is the body complete."
+        }
+    ],
+    "3_5_WebSocket_Buffers": [
+        {
+            "type": "quiz",
+            "question": "byte[1] & 127 equals 126 in a WebSocket frame. What do you do next?",
+            "options": [
+                "That IS the length, read payload",
+                "Read next 2 bytes as 16-bit uint for real length",
+                "Read next 8 bytes as 64-bit uint",
+                "Drop the frame as invalid"
+            ],
+            "answer": 1,
+            "explanation": "126 is a sentinel meaning 'real length is in the next 2 bytes'. 127 means 'next 8 bytes'. Values ≤125 are the actual payload length."
+        },
+        {
+            "type": "quiz",
+            "question": "To unmask payload byte at index i with key [m0,m1,m2,m3] you compute:",
+            "options": [
+                "payload[i] + key[i]",
+                "payload[i] XOR key[i % 4]",
+                "payload[i] AND key[i % 4]",
+                "key[i] - payload[i]"
+            ],
+            "answer": 1,
+            "explanation": "XOR with the cyclic 4-byte key: unmasked = payload[i] ^ key[i % 4]. XOR is self-inverse so the same operation masks and unmasks."
+        }
+    ],
+    "3_6_Video1": [
+        {
+            "type": "quiz",
+            "question": "The main problem with serving a 2-hour movie as a plain .mp4 file is:",
+            "options": [
+                "MP4 has no audio",
+                "User must download the whole file before playback begins reliably",
+                "Browsers can't play MP4",
+                "It requires special server software"
+            ],
+            "answer": 1,
+            "explanation": "Plain MP4 delivery requires the full file before seekable playback. HLS/DASH fix this by chunking the video into small independently requestable segments."
+        }
+    ],
+    "3_6_Video2": [
+        {
+            "type": "quiz",
+            "question": "In HLS, what does the master .m3u8 file contain?",
+            "options": [
+                "All video data",
+                "Links to variant playlists at different resolutions/bitrates",
+                "The only file needed",
+                "The video thumbnail"
+            ],
+            "answer": 1,
+            "explanation": "The master playlist references variant stream playlists (1080p, 720p, 480p). Each variant lists .ts segment files. The player picks the right variant based on bandwidth."
+        }
+    ],
+    "REC_2_HW1": [
+        {
+            "type": "quiz",
+            "question": "Why is request_data.split('\\r\\n\\r\\n') dangerous on raw binary requests?",
+            "options": [
+                "Too slow for large files",
+                "Image bytes may contain that sequence causing the split to cut the image",
+                "Python split doesn't work on bytes",
+                "Headers get corrupted"
+            ],
+            "answer": 1,
+            "explanation": "Binary files contain arbitrary bytes. If an image contains 0x0D0A0D0A, a naive split truncates it. Fix: find the FIRST b'\\r\\n\\r\\n', split once, treat the rest as raw bytes."
+        }
+    ],
+    "REC_10_HW4_websockets": [
+        {
+            "type": "quiz",
+            "question": "7-bit payload length is 50. At which byte index does the masking key begin?",
+            "options": [
+                "Byte 0",
+                "Byte 2",
+                "Byte 4",
+                "Byte 8"
+            ],
+            "answer": 1,
+            "explanation": "Bytes 0-1 are the fixed header. When 7-bit length is ≤125, the 4-byte masking key starts at byte 2. If length were 126, the key starts at byte 4."
+        }
+    ],
+    "REC_MT_REVIEW": [
+        {
+            "type": "quiz",
+            "question": "Every CSE312 HTTP response must include which headers?",
+            "options": [
+                "Content-Type and Authorization",
+                "Content-Length, Content-Type, and X-Content-Type-Options: nosniff",
+                "Set-Cookie and Location",
+                "Host and Accept"
+            ],
+            "answer": 1,
+            "explanation": "Content-Length tells the client when the body ends; Content-Type defaults to text/plain; charset=utf-8; X-Content-Type-Options: nosniff is required on all responses per the HW1 spec."
+        },
+        {
+            "type": "quiz",
+            "question": "A user logs out (server deletes the DB token row) but replays the old cookie. What happens?",
+            "options": [
+                "Server accepts — cookie is still valid",
+                "Server rejects — token hash row is gone from DB",
+                "Browser rejects automatically",
+                "Server returns 404"
+            ],
+            "answer": 1,
+            "explanation": "Clearing the cookie client-side alone is not enough. The server must delete the token hash from MongoDB. A replayed cookie won't match any DB entry and is rejected as unauthenticated."
+        }
+    ]
+}
