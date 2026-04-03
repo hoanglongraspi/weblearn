@@ -267,34 +267,35 @@ function LessonStep({ module }) {
         </div>
       )}
 
-      <div className="slide-stack">
-        {module.lectureSections.map((section) => (
-          <article key={section.id} className="source-slide-card">
-            <div className="source-slide-top">
-              <span className="source-slide-number">{section.label}</span>
-              <h3>{section.title}</h3>
-            </div>
-
-            <div className="source-slide-body">
-              {section.bullets && section.bullets.length > 0 ? (
-                <ul className="rich-list" style={{ margin: '8px 0 0', paddingLeft: '4px' }}>
-                  {section.bullets.map((point, idx) =>
-                    section.isBullet?.[idx] !== false ? (
-                      <li key={idx}>{point}</li>
-                    ) : (
-                      <p key={idx} style={{ margin: '4px 0' }}>{point}</p>
-                    )
-                  )}
-                </ul>
-              ) : (
-                <p style={{ color: 'var(--text-muted)', fontStyle: 'italic', margin: 0 }}>
-                  Title / transition slide — no additional bullet content.
-                </p>
-              )}
-            </div>
-          </article>
-        ))}
-      </div>
+      {(() => {
+        const contentSections = module.lectureSections.filter(
+          (s) => s.bullets && s.bullets.length > 0
+        );
+        if (!contentSections.length) return null;
+        return (
+          <div className="slide-stack">
+            {contentSections.map((section) => (
+              <article key={section.id} className="source-slide-card">
+                <div className="source-slide-top">
+                  <span className="source-slide-number">{section.label}</span>
+                  <h3>{section.title}</h3>
+                </div>
+                <div className="source-slide-body">
+                  <ul className="rich-list" style={{ margin: '8px 0 0', paddingLeft: '4px' }}>
+                    {section.bullets.map((point, idx) =>
+                      section.isBullet?.[idx] !== false ? (
+                        <li key={idx}>{point}</li>
+                      ) : (
+                        <p key={idx} style={{ margin: '4px 0' }}>{point}</p>
+                      )
+                    )}
+                  </ul>
+                </div>
+              </article>
+            ))}
+          </div>
+        );
+      })()}
 
 
 
